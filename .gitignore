@@ -1,0 +1,12 @@
+.secrets/
+.tools/
+**/bin/
+**/obj/
+artifacts/
+.vs/
+*.user
+*.suo
+.env*
+*.log
+support-bot.local.json
+distribution/profile/

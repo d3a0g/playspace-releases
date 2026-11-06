@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>Assets\playspace.ico</ApplicationIcon>
+    <AssemblyName>LauncherPlaySpace</AssemblyName>
+    <RootNamespace>GameLauncherGUI</RootNamespace>
+    <Product>LauncherPlaySpace</Product>
+    <Title>LauncherPlaySpace</Title>
+    <Description>Библиотека игр, статистика Steam, рекомендации и управление модами.</Description>
+    <Version>1.0.3</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets/recommendations-extra.json" LogicalName="LauncherPlaySpace.Recommendations" />
+    <None Update="update-source.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <EmbeddedResource Include="Assets\playspace.ico" LogicalName="GameLauncherGUI.AppIcon" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+</Project>
