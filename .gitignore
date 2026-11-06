@@ -9,4 +9,8 @@ artifacts/
 .env*
 *.log
 support-bot.local.json
+support-tickets.local.json
+support-tickets.local.json.tmp
+support-bot-offset.txt
+support-bot.pid
 distribution/profile/

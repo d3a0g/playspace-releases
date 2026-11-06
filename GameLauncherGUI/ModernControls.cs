@@ -75,7 +75,7 @@ internal sealed class LibraryHero : Control
     {
         bool changed = title != headline || subtitle != detail;
         headline = title; detail = subtitle; icon = gameIcon; hasGame = selected; TabStop = selected;
-        if (changed) { transition = 0; clock.Restart(); animation.Start(); }
+        if (changed) { transition = PresentationOptions.ReduceMotion?1:0; clock.Restart(); if(!PresentationOptions.ReduceMotion)animation.Start();else Invalidate(); }
         Invalidate();
     }
 
@@ -83,7 +83,7 @@ internal sealed class LibraryHero : Control
     public void SetArtwork(Bitmap? image)
     {
         var previous = artwork; artwork = image; previous?.Dispose();
-        transition = 0; clock.Restart(); animation.Start(); Invalidate();
+        transition = PresentationOptions.ReduceMotion?1:0; clock.Restart(); if(!PresentationOptions.ReduceMotion)animation.Start(); Invalidate();
     }
 
     protected override void OnMouseMove(MouseEventArgs e) { base.OnMouseMove(e); Cursor = hasGame && PlayBounds.Contains(e.Location) ? Cursors.Hand : Cursors.Default; }
@@ -101,6 +101,7 @@ internal sealed class LibraryHero : Control
     protected override void OnPaint(PaintEventArgs e)
     {
         if (Width < 2 || Height < 2) return;
+        if(PresentationOptions.ReduceMotion){transition=1;animation.Stop();}
         var g = e.Graphics;
         g.SmoothingMode = SmoothingMode.AntiAlias;
         using var path = VisualTheme.Rounded(new Rectangle(0, 0, Width - 1, Height - 1), 20);
@@ -218,10 +219,12 @@ public sealed class ModernButton : Button
         if (Width < 2 || Height < 2) return;
         var g = e.Graphics;
         g.Clear(Parent?.BackColor ?? Color.FromArgb(14, 17, 27));
+        if(PresentationOptions.ReduceMotion){animation.Stop();hover=hovered&&Enabled?1:0;ripple=1;}
         g.SmoothingMode = SmoothingMode.AntiAlias;
         var bounds = new Rectangle(1, pressed ? 2 : 1, Width - 3, Height - 3);
         using var path = VisualTheme.Rounded(bounds, 12);
-        Color fill = Enabled ? VisualTheme.Blend(IsActive ? Color.FromArgb(54, 43, 91) : baseColor, Color.FromArgb(164, 148, 255), hover * .22f) : Color.FromArgb(34, 37, 51);
+        bool accentButton=baseColor.R>75&&baseColor.B>170&&baseColor.B>baseColor.R*1.3&&baseColor.G<160;
+        Color fill = Enabled ? VisualTheme.Blend(IsActive ? VisualTheme.Blend(Color.FromArgb(23,28,42),VisualTheme.Accent,.28f) : accentButton?VisualTheme.Accent:baseColor, VisualTheme.Accent, hover * .22f) : Color.FromArgb(34, 37, 51);
         using var gradient = new LinearGradientBrush(bounds, ControlPaint.Light(fill, .07f), fill, 90);
         g.FillPath(gradient, path);
         using var border = new Pen(Color.FromArgb((int)((IsActive ? 115 : 36) + hover * 75), 195, 182, 255));
@@ -272,9 +275,12 @@ public sealed class CustomCheckListBox : Panel
 {
     [System.ComponentModel.DefaultValue(false)]
     public bool PosterView { get; set; }
+    [System.ComponentModel.DefaultValue(0)]
+    public int PosterMinimumWidth { get; set; }
+    internal void Navigate(Keys key)=>OnKeyDown(new KeyEventArgs(key));
     [System.ComponentModel.DefaultValue(true)]
     public bool ShowCheckBoxes { get; set; } = true;
-    private int Columns => PosterView ? Math.Max(1, (Width - 22) / 160) : 1;
+    private int Columns => PosterView ? Math.Max(1, (Width - 22) / (PosterMinimumWidth>0?PosterMinimumWidth:PresentationOptions.PosterWidth)) : 1;
     private int RowHeight => PosterView ? (int)(((Width - 22) / Columns - 12) * 1.5) + 71 : ItemHeight;
     private int ContentHeight => ((Items.Count + Columns - 1) / Columns) * RowHeight + Padding.Vertical;
     private Rectangle CardBounds(int index) => PosterView
@@ -495,6 +501,7 @@ public sealed class CustomCheckListBox : Panel
     protected override void OnPaint(PaintEventArgs e)
     {
         base.OnPaint(e);
+        if(PresentationOptions.ReduceMotion){animation.Stop();hover=1;}
         if (PosterView && Items.Count > 0) { PaintPosters(e.Graphics); return; }
         if (Width < 70 || Height < 2) return;
         var g = e.Graphics;

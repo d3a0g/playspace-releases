@@ -32,6 +32,7 @@ public partial class Form1
     {
         lastSteamHoursAttempt=DateTimeOffset.UtcNow;
         try {
+            if(Workspace.For(appDataFolder).Offline)return "Офлайн-режим: используются сохранённые часы Steam.";
             string url=$"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={key}&steamid={user}&include_appinfo=false&include_played_free_games=true";
             var response=JObject.Parse(await (AchievementClient??mediaClient).GetStringAsync(url));
             if(IsDisposed||revision!=steamRevision)return "";

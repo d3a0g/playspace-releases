@@ -16,6 +16,9 @@ internal static class UpdateChecks
         void Check(bool okay,string message){if(!okay)throw new Exception(message);}
         void Reject(Action work){try{work();}catch(Exception ex)when(ex is IOException or InvalidDataException or Newtonsoft.Json.JsonException or HttpRequestException or OperationCanceledException){return;}throw new Exception("Invalid update accepted");}
         Check(UpdateService.ParseVersion("v1.10.0")>UpdateService.ParseVersion("1.9.9"),"Numeric version comparison failed");
+        Check(UpdateAvailableForm.FormatNotes("## Библиотека\r\n- **Поиск** теперь очищается.\r\n\r\n### Steam\n* Часы сохранены.").Replace("\r\n","\n")=="БИБЛИОТЕКА\n• Поиск теперь очищается.\n\nSTEAM\n• Часы сохранены.","Release note sections/bullets/newlines weren't formatted");
+        Check(UpdateAvailableForm.FormatNotes(" ").Contains("не добавил список"),"Missing release notes aren't explained");
+        Check(UpdateAvailableForm.FormatNotes("DLSS 5; версия 1.0.3; 500 игр.")=="DLSS 5; версия 1.0.3; 500 игр.","Plain release notes were changed");
         Check(UpdateService.FeedUri("https://drive.google.com/file/d/ABC_123/view?usp=sharing").Query.Contains("id=ABC_123"),"Drive file link wasn't converted");
         foreach(string url in new[]{"http://example.com/latest.json","file:///C:/update.exe","https://user:secret@example.com/latest.json"})Reject(()=>UpdateService.HttpsUrl(url));
         Reject(()=>UpdateService.Parse("{}"));Reject(()=>UpdateService.Parse("{\"version\":\"bad\",\"downloadUrl\":\"https://example.com\"}"));Reject(()=>UpdateService.Parse("<html>Sign in</html>"));
@@ -35,7 +38,13 @@ internal static class UpdateChecks
             var flags=BindingFlags.Instance|BindingFlags.NonPublic;var tray=(NotifyIcon)typeof(Form1).GetField("tray",flags)!.GetValue(form)!;
             var toggle=tray.ContextMenuStrip!.Items.OfType<ToolStripMenuItem>().Single(item=>item.Text=="Уведомления об обновлениях");Check(!toggle.Checked,"Tray didn't load notification preference");toggle.PerformClick();Check(toggle.Checked&&LauncherPreferences.Load(folder).NotificationsEnabled,"Tray didn't persist notification toggle");
             typeof(Form1).GetMethod("SetNotifications",flags)!.Invoke(form,new object[]{false});Check(!toggle.Checked&&!LauncherPreferences.Load(folder).NotificationsEnabled,"Settings notification toggle didn't update tray");
-            using var dialog=new UpdateAvailableForm(new("1.10.0","https://example.com/release.zip","Новые функции и исправления."));dialog.Show();
+            string notes=File.ReadAllText("GameLauncherGUI/release-notes/1.0.4.md");
+            using var dialog=new UpdateAvailableForm(new("1.0.4","https://example.com/release.zip",notes));dialog.Show();Application.DoEvents();
+            IEnumerable<Control> Children(Control parent)=>parent.Controls.Cast<Control>().SelectMany(child=>new[]{child}.Concat(Children(child)));
+            var details=Children(dialog).OfType<FormattedDescription>().Single();
+            Check(details.Text.Contains("ОКНО ОБНОВЛЕНИЯ")&&details.Text.Contains("• "),"Release notes card didn't show formatted changes");
+            dialog.Size=dialog.MinimumSize;Application.DoEvents();Check(details.Width>350&&details.Height>120,"Release notes card collapsed at minimum window size");
+            dialog.Size=new Size(760,650);Application.DoEvents();
             Directory.CreateDirectory("artifacts");using var preview=new Bitmap(dialog.Width,dialog.Height);dialog.DrawToBitmap(preview,dialog.ClientRectangle);preview.Save("artifacts/update-available.png");
         }
         Console.WriteLine("PASS: update versions/JSON, HTTPS and Drive links, server errors/size limit, notification persistence and tray/settings toggles, update window. Fixture responses only.");

@@ -9,6 +9,13 @@ internal sealed class LauncherPreferences
     public bool NotificationsEnabled { get; set; } = true;
     public string UpdateFeedUrl { get; set; } = "";
     public string LastNotifiedVersion { get; set; } = "";
+    public bool HideWhilePlaying { get; set; }
+    public bool RestoreAfterPlaying { get; set; } = true;
+    public bool OfflineMode { get; set; }
+    public string AccentName { get; set; } = "Фиолетовый";
+    public int TextScalePercent { get; set; } = 100;
+    public int PosterWidth { get; set; } = 160;
+    public bool ReduceMotion { get; set; }
     public LauncherPreferences Copy() => (LauncherPreferences)MemberwiseClone();
     public static LauncherPreferences Load(string folder)
     {

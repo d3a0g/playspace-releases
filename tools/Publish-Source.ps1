@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([string]$Repository='d3a0g/playspace-releases',[switch]$Publish)
+param([string]$Repository='d3a0g/LauncherPlaySpace',[switch]$Publish,[string]$CommitMessage='Release LauncherPlaySpace 1.0.4: workspace, backups, network tools and documentation')
 $ErrorActionPreference='Stop'
 $workspace=Split-Path -Parent $PSScriptRoot
 $utf8=New-Object System.Text.UTF8Encoding($false)
@@ -20,7 +20,7 @@ foreach($directory in @('GameLauncherGUI','GameLauncherGUI.Tests','PlaySpace.Sup
         $_.FullName -notmatch '[\\/](bin|obj)[\\/]' -and $_.Extension -in @('.cs','.csproj','.md','.ps1','.ico','.png','.json')
     }
 }
-foreach($name in @('README.md','LICENSE','THIRD_PARTY_NOTICES.md','CONTRIBUTING.md','SECURITY.md','.gitignore','distribution/README.md')){$files+=Get-Item -LiteralPath (Join-Path $workspace $name)}
+foreach($name in @('README.md','LICENSE','THIRD_PARTY_NOTICES.md','CONTRIBUTING.md','SECURITY.md','.gitignore','distribution/README.md','distribution/START-HERE.txt')){$files+=Get-Item -LiteralPath (Join-Path $workspace $name)}
 $files=@($files|Sort-Object FullName -Unique)
 $secretFile=Join-Path $workspace '.secrets/support-bot.local.json'
 $privateToken=''
@@ -50,7 +50,7 @@ foreach($node in $nodes){
     }else{$treeNodes+=$node}
 }
 $tree=Request "repos/$Repository/git/trees" @{base_tree=$baseTree;tree=$treeNodes}
-$commit=Request "repos/$Repository/git/commits" @{message='Open source LauncherPlaySpace 1.0.3 and add interface gallery';tree=$tree.sha;parents=@($head)}
+$commit=Request "repos/$Repository/git/commits" @{message=$CommitMessage;tree=$tree.sha;parents=@($head)}
 $requestFile=Join-Path $stage 'request.json'
 [IO.File]::WriteAllText($requestFile,(@{sha=$commit.sha;force=$false}|ConvertTo-Json -Compress),$utf8)
 & $gh api --method PATCH "repos/$Repository/git/refs/heads/main" --input $requestFile --jq .object.sha

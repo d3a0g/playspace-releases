@@ -68,8 +68,7 @@ internal sealed class DlssManager
     public static async Task<string> Download(DlssLibrary library,string folder,CancellationToken cancellation)
     {
         if(!DlssLibrary.All.Contains(library))throw new InvalidDataException("Неизвестный источник DLSS.");Directory.CreateDirectory(folder);string path=Path.Combine(folder,library.Tag+"-nvngx_dlss.dll"),temp=path+"."+Guid.NewGuid().ToString("N")+".tmp";
-        using var http=new HttpClient{Timeout=TimeSpan.FromMinutes(3)};
-        try{using var response=await http.GetAsync(library.Url,HttpCompletionOption.ResponseHeadersRead,cancellation);response.EnsureSuccessStatusCode();await using(var source=await response.Content.ReadAsStreamAsync(cancellation))await using(var output=new FileStream(temp,FileMode.CreateNew)){byte[] buffer=new byte[81920];int read;long size=0;while((read=await source.ReadAsync(buffer,cancellation))>0){size+=read;if(size>100*1024*1024)throw new InvalidDataException("Библиотека слишком велика.");await output.WriteAsync(buffer.AsMemory(0,read),cancellation);}}
+        try{byte[] bytes=await Workspace.Current.Transfers.Fetch("NVIDIA DLSS SR · "+library.Tag,new Uri(library.Url),100L*1024*1024,cancellation);await File.WriteAllBytesAsync(temp,bytes,cancellation);
             await VerifyNvidia(temp);cancellation.ThrowIfCancellationRequested();File.Move(temp,path,true);return path;
         }finally{if(File.Exists(temp))File.Delete(temp);}
     }

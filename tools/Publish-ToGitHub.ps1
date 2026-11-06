@@ -2,10 +2,12 @@
 param(
     [Parameter(Mandatory=$true)][ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version,
     [ValidatePattern('^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$')][string]$Repository='d3a0g/playspace-releases',
-    [string]$Notes='Новая версия LauncherPlaySpace.'
+    [string]$Notes='',
+    [string]$NotesFile=''
 )
 $ErrorActionPreference='Stop'
 $workspace=Split-Path -Parent $PSScriptRoot
+$Notes=& (Join-Path $PSScriptRoot 'Get-ReleaseNotes.ps1') -Version $Version -Notes $Notes -NotesFile $NotesFile
 $ghCommand=Get-Command gh -ErrorAction SilentlyContinue
 if($ghCommand){$gh=$ghCommand.Source}else{$gh=Join-Path $workspace '.tools/github-cli-2.103.3/bin/gh.exe'}
 if(-not(Test-Path -LiteralPath $gh)){throw 'GitHub CLI не найден.'}

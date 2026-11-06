@@ -47,11 +47,12 @@ internal static class GameArtworkLoader
         }
         try
         {
-            string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GameLauncherPRO", "artwork");
+            string folder = Path.Combine(Workspace.Current.Folder, "artwork");
             Directory.CreateDirectory(folder);
             string file = Path.Combine(folder, id + "-hero.jpg");
             if (!File.Exists(file))
             {
+                if(Workspace.Current.Offline)return null;
                 using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromSeconds(8) };
                 using var response = client.GetAsync($"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{id}/library_hero.jpg", System.Net.Http.HttpCompletionOption.ResponseHeadersRead).GetAwaiter().GetResult();
                 response.EnsureSuccessStatusCode();

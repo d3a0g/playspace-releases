@@ -76,6 +76,7 @@ internal sealed class ModInstaller
         if (!Directory.Exists(stateRoot)) return new();
         using var guard = Lock();
         Recover();
+        ModProfileStore.Recover(root);
         return LoadState();
     }
     private ModState LoadState() => File.Exists(StateFile) ? JsonConvert.DeserializeObject<ModState>(File.ReadAllText(StateFile))
@@ -210,7 +211,7 @@ internal sealed class ModInstaller
         foreach (var mod in plan)
         {
             progress.Report("Загрузка " + mod.FullId);
-            byte[] archive = await catalog.DownloadAsync(mod.Version.DownloadUrl, cancellation);
+            byte[] archive = await catalog.DownloadAsync(mod.Version.DownloadUrl, cancellation,"Thunderstore · "+mod.FullId);
             var files = await Task.Run(() => MapArchive(mod, archive, adapter), cancellation);
             if ((total += files.Values.Sum(data => (long)data.Length)) > 256L * 1024 * 1024) throw new InvalidDataException("Суммарный размер превышает 256 МБ.");
             prepared.Add((mod, files));
@@ -238,7 +239,7 @@ internal sealed class ModInstaller
 
     private void ApplyCore(List<(ModSelection Mod, Dictionary<string, InstallSource> Files)> prepared, IProgress<string> progress)
     {
-        using var guard = Lock(); Recover();
+        using var guard = Lock(); Recover(); ModProfileStore.Recover(root);
         var state = LoadState();
         var writes = new Dictionary<string, InstallSource>(StringComparer.OrdinalIgnoreCase);
         var journal = new ModJournal();
@@ -280,7 +281,7 @@ internal sealed class ModInstaller
 
     public void Uninstall(string id)
     {
-        using var guard = Lock(); Recover();
+        using var guard = Lock(); Recover(); ModProfileStore.Recover(root);
         var state = LoadState();
         if (!state.Packages.TryGetValue(id, out var package)) return;
         var frameworks = ModGameAdapter.All.Select(adapter => adapter.Loader).Append(UnrealModLayout.Shim).ToHashSet(StringComparer.OrdinalIgnoreCase);

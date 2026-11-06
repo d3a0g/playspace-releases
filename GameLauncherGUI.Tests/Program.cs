@@ -32,6 +32,18 @@ internal static class Program
     [STAThread]
     private static void Main(string[] args)
     {
+        if(args.Contains("--support-bot")){SupportBotChecks.Run();return;}
+        if(args.Contains("--network-ui")){NetworkChecks.Run(true);return;}
+        if(args.Contains("--diagnostics-ui")){DiagnosticChecks.Run(true);return;}
+        if(args.Contains("--game-care-ui")){GameCareChecks.Run(true);return;}
+        if(args.Contains("--workspace-ui")){WorkspaceChecks.Run(true);return;}
+        if(args.Contains("--shortcut-ui")){ShortcutChecks.Run(true);return;}
+        if(args.Contains("--verify-warp-package")){
+            string file=Path.GetFullPath("artifacts/Cloudflare-WARP-verification.msi");
+            WarpClient.VerifyCloudflare(file,default).GetAwaiter().GetResult();
+            var header=new byte[8];using(var input=File.OpenRead(file))input.ReadExactly(header);WarpInstaller.ValidateHeader(header);
+            Console.WriteLine("PASS: actual official Cloudflare MSI format and Authenticode publisher verified by launcher code. No installation or network changes.");return;
+        }
         if(args.Contains("--public-screenshots")){PublicScreenshots.Run();return;}
         if(args.Contains("--verify-universal-dlss5")){UniversalDlss5Checks.VerifyRealPackage();return;}
         if(args.Contains("--network-dlss"))
@@ -189,6 +201,11 @@ internal static class Program
         DiscoveryChecks.Run(args.Contains("--ui"));
         PreferencesChecks.Run(args.Contains("--ui"));
         UpdateChecks.Run(args.Contains("--ui"));
+        NetworkChecks.Run(args.Contains("--ui"));
+        DiagnosticChecks.Run(args.Contains("--ui"));
+        GameCareChecks.Run(args.Contains("--ui"));
+        WorkspaceChecks.Run(args.Contains("--ui"));
+        ShortcutChecks.Run(args.Contains("--ui"));
         RefreshChecks.Run(args.Contains("--ui"));
         SupportBotChecks.Run();
         UniversalDlss5Checks.Run(args.Contains("--ui"));

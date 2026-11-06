@@ -65,7 +65,8 @@ internal sealed class RecommendationsForm : StudioDialog
     private int viewVersion;
     private static readonly HttpClient sharedHttp=new() {Timeout=TimeSpan.FromSeconds(12)};
     private readonly HttpClient http;
-    public RecommendationsForm(string folder,Func<GameInfo,Task<Bitmap?>> loadPoster,HttpClient? storeClient=null)
+    private bool Offline=>LauncherPreferences.Load(Path.GetDirectoryName(cache)!).OfflineMode;
+    public RecommendationsForm(string folder,Func<GameInfo,Task<Bitmap?>> loadPoster,HttpClient? storeClient=null,string? initialGameId=null)
     {
         http=storeClient??sharedHttp;this.loadPoster=loadPoster;favorites=new(folder);cache=Path.Combine(folder,"store-details");
         Text="PLAYSPACE / Рекомендации";MinimumSize=new Size(960,720);Size=new Size(1160,830);
@@ -91,7 +92,7 @@ internal sealed class RecommendationsForm : StudioDialog
         grid.ItemClick+=async(s,e)=>await SelectGame();grid.ItemDoubleClick+=async(s,e)=>await SelectGame();
         grid.PinToggleRequested+=i=>Toggle(visible.ElementAtOrDefault(i));pin.Click+=(s,e)=>Toggle(selected);
         store.Click+=(s,e)=>{if(selected!=null)try{System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(selected.StoreUrl){UseShellExecute=true});}catch(System.ComponentModel.Win32Exception){status.Text="Не удалось открыть браузер.";}};
-        Shown+=(s,e)=>RefreshGames();description.Text="Выбери игру: здесь появятся описание и скриншоты из Steam. Подборка по жанрам, без учёта характеристик ПК.";
+        Shown+=async(s,e)=>{RefreshGames();if(initialGameId!=null){int index=Array.FindIndex(visible,g=>g.Id==initialGameId);if(index>=0){grid.SelectItem(index);await SelectGame();}}};description.Text="Выбери игру: здесь появятся описание и скриншоты из Steam. Подборка по жанрам, без учёта характеристик ПК.";
     }
     private void Toggle(RecommendedGame? game)
     {
@@ -106,7 +107,7 @@ internal sealed class RecommendationsForm : StudioDialog
         visible=RecommendedGame.All.Where(g=>(category.SelectedIndex==0 || category.SelectedIndex==1&&favorites.Ids.Contains(g.Id)||g.Categories.Contains(filter))&&g.Name.Contains(search.Text,StringComparison.CurrentCultureIgnoreCase)).ToArray();
         detailCancellation?.Cancel();selected=null;store.Enabled=pin.Enabled=false;title.Text="Рекомендации";description.Text="Выбери игру, чтобы прочитать описание магазина Steam.";ClearShots();grid.Items.Clear();
         foreach(var game in visible)grid.Items.Add(new CustomListItem(game.Name,false,string.Join(" · ",game.Categories)){IsPinned=favorites.Ids.Contains(game.Id)});
-        grid.ResetView();status.Text=visible.Length==0?"Здесь пока нет игр. Закрепляй понравившиеся карточки звёздочкой.":$"Игр в подборке: {visible.Length}";
+        grid.ResetView();status.Text=(Offline?"Офлайн · сохранённые данные. ":"")+(visible.Length==0?"Здесь пока нет игр. Закрепляй понравившиеся карточки звёздочкой.":$"Игр в подборке: {visible.Length}");
         var games=visible.ToArray();var items=grid.Items.ToArray();
         int cursor=-1;
         async Task LoadNext()
@@ -126,20 +127,25 @@ internal sealed class RecommendationsForm : StudioDialog
         var game=selected;if(game!=null){cataloguePage.Hide();gamePage.Show();gamePage.BringToFront();}ClearShots();store.Enabled=pin.Enabled=game!=null;UpdatePin();if(game==null)return;title.Text=game.Name;description.Text="Загрузка описания Steam…";
         try {
             JObject? data=null;string file=Path.Combine(cache,game.Id+".json");
-            try {var response=JObject.Parse(await http.GetStringAsync($"https://store.steampowered.com/api/appdetails?appids={game.Id}&l=russian",token));data=response[game.Id]?["success"]?.Value<bool>()==true?response[game.Id]?["data"] as JObject:null;
+            if(Offline){if(File.Exists(file))data=JObject.Parse(await File.ReadAllTextAsync(file,token));}
+            else try {var response=JObject.Parse(await http.GetStringAsync($"https://store.steampowered.com/api/appdetails?appids={game.Id}&l=russian",token));data=response[game.Id]?["success"]?.Value<bool>()==true?response[game.Id]?["data"] as JObject:null;
                 if(data!=null){Directory.CreateDirectory(cache);await File.WriteAllTextAsync(file,data.ToString(),token);}}
             catch(Exception ex) when(ex is HttpRequestException or TaskCanceledException or IOException or UnauthorizedAccessException) {if(!token.IsCancellationRequested&&File.Exists(file))data=JObject.Parse(await File.ReadAllTextAsync(file,token));}
             token.ThrowIfCancellationRequested();if(IsDisposed)return;
-            if(data==null){description.Text="Steam не предоставил описание. Можно открыть официальную страницу игры.";return;}
+            if(data==null){description.Text=Offline?"Офлайн-режим: описание этой игры ещё не сохранено. Откройте её при наличии подключения, чтобы сохранить данные.":"Steam не предоставил описание. Можно открыть официальную страницу игры.";return;}
             description.Text=GameDescription.Format(data);
             foreach(var shot in (data["screenshots"] as JArray??new JArray()).Take(12)) {
                 string? url=shot.Value<string>("path_full")??shot.Value<string>("path_thumbnail");if(!Uri.TryCreate(url,UriKind.Absolute,out var uri)||uri.Scheme!="https"||!uri.Host.EndsWith(".steamstatic.com",StringComparison.OrdinalIgnoreCase))continue;
+                string cachedShot=Path.Combine(cache,"screenshots",game.Id+"-"+Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(uri.AbsoluteUri)))[..16]+".jpg");
+                if(File.Exists(cachedShot))try{using var cachedImage=Image.FromFile(cachedShot);var copied=new Bitmap(cachedImage);screenshots.Add(copied);if(screenshots.Count==1)ShowShot(0);else UpdateShotControls();continue;}catch(Exception ex)when(ex is IOException or ArgumentException or OutOfMemoryException){}
+                if(Offline)continue;
                 try {
                     using var response=await http.GetAsync(uri,HttpCompletionOption.ResponseHeadersRead,token);response.EnsureSuccessStatusCode();
                     using var input=await response.Content.ReadAsStreamAsync(token);using var bytes=new MemoryStream();byte[] buffer=new byte[81920];int count;
                     while((count=await input.ReadAsync(buffer,token))>0){if(bytes.Length+count>8*1024*1024)throw new InvalidDataException();bytes.Write(buffer,0,count);}
                     bytes.Position=0;using var original=Image.FromStream(bytes);var image=new Bitmap(original,1280,Math.Max(1,1280*original.Height/original.Width));
                     if(IsDisposed||token.IsCancellationRequested){image.Dispose();return;}
+                    try{Directory.CreateDirectory(Path.GetDirectoryName(cachedShot)!);string temporary=cachedShot+"."+Guid.NewGuid().ToString("N")+".tmp";try{image.Save(temporary,System.Drawing.Imaging.ImageFormat.Jpeg);File.Move(temporary,cachedShot,true);}finally{if(File.Exists(temporary))File.Delete(temporary);}}catch(Exception ex)when(ex is IOException or UnauthorizedAccessException){}
                     screenshots.Add(image);if(screenshots.Count==1)ShowShot(0);else UpdateShotControls();
                 } catch(Exception ex) when(ex is HttpRequestException or IOException or ArgumentException or OutOfMemoryException) { }
             }
@@ -158,7 +164,7 @@ internal sealed class RecommendationsForm : StudioDialog
     }
     private void BackToCatalogue(){detailCancellation?.Cancel();ClearShots();gamePage.Hide();cataloguePage.Show();cataloguePage.BringToFront();if(category.SelectedIndex==1)RefreshGames();}
     private void ShowShot(int index){if(screenshots.Count==0)return;shotIndex=(index%screenshots.Count+screenshots.Count)%screenshots.Count;banner.Image=screenshots[shotIndex];UpdateShotControls();}
-    private void UpdateShotControls(){previousShot.Enabled=nextShot.Enabled=screenshots.Count>1;shotCount.Text=screenshots.Count==0?"Скриншоты появятся после загрузки из Steam":$"{shotIndex+1} / {screenshots.Count}  ·  Скриншоты Steam";}
+    private void UpdateShotControls(){previousShot.Enabled=nextShot.Enabled=screenshots.Count>1;shotCount.Text=screenshots.Count==0?(Offline?"Офлайн · сохранённых скриншотов нет":"Скриншоты появятся после загрузки из Steam"):$"{shotIndex+1} / {screenshots.Count}  ·  "+(Offline?"Офлайн-кеш Steam":"Скриншоты Steam");}
     private void ClearShots(){banner.Image=null;foreach(var image in screenshots)image.Dispose();screenshots.Clear();shotIndex=0;UpdateShotControls();}
     protected override void Dispose(bool disposing){if(disposing){viewVersion++;detailCancellation?.Cancel();detailCancellation?.Dispose();ClearShots();}base.Dispose(disposing);}
 }

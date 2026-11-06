@@ -5,8 +5,10 @@ internal sealed class ModernSelect : UserControl
 {
     public List<object> Items { get; } = new();
     private int selectedIndex=-1;
+    private string placeholder="Сортировка";
+    internal void SetPlaceholder(string text){placeholder=text;if(selectedIndex<0)button.Text=placeholder+"  ▾";}
     [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-    public int SelectedIndex { get=>selectedIndex;set {if(selectedIndex==value)return;selectedIndex=value;button.Text=(SelectedItem?.ToString()??"Сортировка")+"  ▾";SelectedIndexChanged?.Invoke(this,EventArgs.Empty);} }
+    public int SelectedIndex { get=>selectedIndex;set {if(selectedIndex==value)return;selectedIndex=value;button.Text=(SelectedItem?.ToString()??placeholder)+"  ▾";SelectedIndexChanged?.Invoke(this,EventArgs.Empty);} }
     [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
     public object? SelectedItem=>Items.ElementAtOrDefault(selectedIndex);
     public event EventHandler? SelectedIndexChanged;

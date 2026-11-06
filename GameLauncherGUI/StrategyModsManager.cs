@@ -115,6 +115,12 @@ internal sealed class StrategyModsManager
         if (enable) enabled.Add(descriptor);
         WriteEnabled(json, enabled);
     }
+    internal void ApplyNamedProfile(string[] descriptors)
+    {
+        EnsureClosed();var all=List();var selected=descriptors.Select(path=>all.SingleOrDefault(mod=>mod.Descriptor==path)??throw new IOException("Мод сохранённого набора не найден. Обновите список и восстановите недостающие моды.")).ToArray();
+        foreach(var mod in selected){if(!Directory.Exists(mod.Content)&&!File.Exists(mod.Content))throw new IOException("Файлы мода отсутствуют: "+mod.Name);if(Dependencies(mod.Metadata).Any(dependency=>!selected.Any(found=>found.Name.Equals(dependency,StringComparison.OrdinalIgnoreCase))))throw new IOException("В наборе не хватает зависимостей: "+mod.Name);}
+        using var guard=ProfileLock();var json=LoadJson();CaptureOriginal(Enabled().ToList());WriteEnabled(json,descriptors.Distinct(StringComparer.OrdinalIgnoreCase).ToList());
+    }
 
     private string RegisterWorkshop(StrategyModEntry entry)
     {

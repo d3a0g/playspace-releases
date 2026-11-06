@@ -3,10 +3,12 @@ param(
     [Parameter(Mandatory=$true)][ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version,
     [string]$DownloadUrl = '',
     [string]$FeedUrl = '',
-    [string]$Notes = 'Новая версия LauncherPlaySpace.'
+    [string]$Notes = '',
+    [string]$NotesFile = ''
 )
 $ErrorActionPreference='Stop'
 $workspace=Split-Path -Parent $PSScriptRoot
+$Notes=& (Join-Path $PSScriptRoot 'Get-ReleaseNotes.ps1') -Version $Version -Notes $Notes -NotesFile $NotesFile
 $releaseFolder=Join-Path $workspace "artifacts/releases/$Version"
 if(Test-Path -LiteralPath $releaseFolder){throw "Папка выпуска уже существует: $releaseFolder. Используйте новый номер версии."}
 foreach($link in @($DownloadUrl,$FeedUrl)) {
@@ -18,6 +20,7 @@ $project=Join-Path $workspace 'GameLauncherGUI/GameLauncherGUI.csproj'
 & dotnet publish $project -c Release -r win-x64 --self-contained true '-p:PublishSingleFile=true' '-p:DebugType=None' '-p:DebugSymbols=false' "-p:Version=$Version" -o $appFolder
 if($LASTEXITCODE -ne 0){throw 'Сборка выпуска завершилась ошибкой.'}
 foreach($notice in @('LICENSE','THIRD_PARTY_NOTICES.md')){Copy-Item -LiteralPath (Join-Path $workspace $notice) -Destination $appFolder}
+Copy-Item -LiteralPath (Join-Path $workspace 'distribution/START-HERE.txt') -Destination $appFolder
 if($FeedUrl){@{feedUrl=$FeedUrl}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $appFolder 'update-source.json') -Encoding UTF8}
 $archive=Join-Path $releaseFolder "LauncherPlaySpace-$Version-win-x64.zip"
 Compress-Archive -Path (Join-Path $appFolder '*') -DestinationPath $archive

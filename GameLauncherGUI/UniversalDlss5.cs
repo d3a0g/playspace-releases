@@ -42,8 +42,8 @@ internal sealed class UniversalDlss5
     public async Task<string> DownloadInstaller(CancellationToken cancellation)
     {
         Directory.CreateDirectory(folder);string file=Path.Combine(folder,"UniversalDLSS5-0.5.1-Setup-x64.exe");if(File.Exists(file)&&DlssManager.Hash(file).Equals(InstallerHash,StringComparison.OrdinalIgnoreCase))return file;
-        string temp=file+"."+Guid.NewGuid().ToString("N")+".tmp";using var client=new HttpClient{Timeout=TimeSpan.FromMinutes(3)};
-        try{using var response=await client.GetAsync(DownloadUrl,HttpCompletionOption.ResponseHeadersRead,cancellation);response.EnsureSuccessStatusCode();await using(var source=await response.Content.ReadAsStreamAsync(cancellation))await using(var output=new FileStream(temp,FileMode.CreateNew)){byte[] buffer=new byte[81920];long size=0;int read;while((read=await source.ReadAsync(buffer,cancellation))>0){size+=read;if(size>16*1024*1024)throw new InvalidDataException("Неожиданный размер пакета.");await output.WriteAsync(buffer.AsMemory(0,read),cancellation);}}
+        string temp=file+"."+Guid.NewGuid().ToString("N")+".tmp";
+        try{byte[] bytes=await Workspace.Current.Transfers.Fetch("UniversalDLSS5 0.5.1",new Uri(DownloadUrl),16L*1024*1024,cancellation);await File.WriteAllBytesAsync(temp,bytes,cancellation);
             if(!DlssManager.Hash(temp).Equals(InstallerHash,StringComparison.OrdinalIgnoreCase))throw new InvalidDataException("Контрольная сумма UniversalDLSS5 не совпала.");File.Move(temp,file,true);return file;
         }finally{if(File.Exists(temp))File.Delete(temp);}
     }

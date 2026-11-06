@@ -35,6 +35,9 @@ namespace GameLauncherGUI
         public PerformanceProfile? Performance { get; set; }
         public DateTimeOffset? LastLaunchUtc { get; set; }
         public string? InstallDirectory { get; set; }
+        public GameCareOptions? Care { get; set; }
+        public string LibraryId { get; set; } = Guid.NewGuid().ToString("N");
+        public override string ToString()=>Name;
     }
 
     public partial class Form1 : Form
@@ -107,6 +110,7 @@ namespace GameLauncherGUI
         {
             updateChecksEnabled = enableUpdateChecks;
             if (storageFolder != null) appDataFolder = storageFolder;
+            Workspace.Use(appDataFolder);
             if (!Directory.Exists(appDataFolder))
             {
                 Directory.CreateDirectory(appDataFolder);
@@ -175,9 +179,9 @@ namespace GameLauncherGUI
             shell.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 210));
             shell.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
             shell.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            var sidebar = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 11,
+            var sidebar = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 13,
                 BackColor = bgColor, Padding = new Padding(4, 10, 20, 0), Margin = Padding.Empty };
-            foreach (float height in new[] { 34F, 52F, 52F, 28F, 56F, 56F, 56F, 56F }) sidebar.RowStyles.Add(new RowStyle(SizeType.Absolute, height));
+            foreach (float height in new[] { 34F, 52F, 52F, 28F, 48F, 48F, 48F, 48F, 52F, 52F }) sidebar.RowStyles.Add(new RowStyle(SizeType.Absolute, height));
             sidebar.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
             sidebar.RowStyles.Add(new RowStyle(SizeType.Absolute, 66));
             sidebar.RowStyles.Add(new RowStyle(SizeType.Absolute, 36));
@@ -222,10 +226,13 @@ namespace GameLauncherGUI
                 catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException or IOException)
                 { lblStatus.Text = "Не удалось открыть Telegram. Напиши @PlaySpaceSupport_bot вручную."; }
             };
-            sidebar.Controls.Add(support, 0, 9);
-            var settings = new ModernButton("⚙  Настройки", Color.FromArgb(31,35,51)) { Dock = DockStyle.Top, Height = 44, Margin = new Padding(0,8,0,0) }; settings.Click += (s,e) => OpenSettings(); sidebar.Controls.Add(settings,0,8);
+            var network=new ModernButton("◎  Сеть / WARP",Color.FromArgb(28,44,55)){Dock=DockStyle.Fill,Margin=new Padding(0,4,0,8),AccessibleName="Сеть и подключение WARP"};
+            var workspaceButton=new ModernButton("Моё пространство",Color.FromArgb(39,37,64)){Dock=DockStyle.Fill,Margin=new Padding(0,4,0,8),AccessibleName="Моё пространство · загрузки, коллекции и оформление"};workspaceButton.Click+=(s,e)=>OpenWorkspace();sidebar.Controls.Add(workspaceButton,0,8);
+            network.Click+=(s,e)=>{using var dialog=new NetworkForm(appDataFolder);dialog.ShowDialog(this);};sidebar.Controls.Add(network,0,9);
+            sidebar.Controls.Add(support, 0, 11);
+            var settings = new ModernButton("⚙  Настройки", Color.FromArgb(31,35,51)) { Dock = DockStyle.Top, Height = 44, Margin = new Padding(0,8,0,0) }; settings.Click += (s,e) => OpenSettings(); sidebar.Controls.Add(settings,0,10);
             sidebar.Controls.Add(new Label { Text = "●  ВСЁ В ОДНОМ МЕСТЕ", Dock = DockStyle.Fill,
-                ForeColor = Color.FromArgb(113, 218, 193), Font = new Font("Segoe UI", 8, FontStyle.Bold), TextAlign = ContentAlignment.BottomLeft }, 0, 10);
+                ForeColor = Color.FromArgb(113, 218, 193), Font = new Font("Segoe UI", 8, FontStyle.Bold), TextAlign = ContentAlignment.BottomLeft }, 0, 12);
             shell.Controls.Add(sidebar, 0, 0);
 
             var content = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 5, Margin = Padding.Empty };
@@ -265,7 +272,7 @@ namespace GameLauncherGUI
             var headingTools = new FlowLayoutPanel { Dock = DockStyle.Fill, WrapContents = false };
             var viewToggle = new ModernButton("▦ / ☰", panelColor) { Width = 72, Height = 30 };
             viewToggle.Click += (s,e) => { int selected = listBoxGames.SelectedIndex; listBoxGames.PosterView = !listBoxGames.PosterView; listBoxGames.ResetView(); listBoxGames.SelectItem(selected); };
-            headingTools.Controls.Add(viewToggle); libraryCount.AutoSize = true; headingTools.Controls.Add(libraryCount);
+            headingTools.Controls.Add(viewToggle); libraryCount.AutoSize = true; headingTools.Controls.Add(libraryCount); headingTools.Controls.Add(collectionFilter);
             libraryHeader.Controls.Add(headingTools, 0, 0);
             libraryHeader.Controls.Add(sortGames, 1, 0);
             libraryHeader.Controls.Add(tools, 0, 1);
@@ -406,7 +413,7 @@ namespace GameLauncherGUI
             listBoxGames.ResetView();
             string query = searchGames.Text.Trim();
             var filtered = myGames.Where(g => (!pinnedOnly || g.IsPinned) && (!recentOnly || g.LastLaunchUtc.HasValue) &&
-                g.Name.Contains(query, StringComparison.CurrentCultureIgnoreCase));
+                g.Name.Contains(query, StringComparison.CurrentCultureIgnoreCase) && (collectionFilter.SelectedIndex<=0||Workspace.For(appDataFolder).Collections.Contains(g,collectionFilter.SelectedItem!.ToString()!)));
             var ordered = filtered.OrderByDescending(g => g.IsPinned);
             visibleGames = recentOnly ? filtered.OrderByDescending(g => g.LastLaunchUtc).ToList() : sortGames.SelectedIndex switch {
                 1 => ordered.ThenBy(g => g.Name, StringComparer.CurrentCultureIgnoreCase).ToList(),
@@ -461,6 +468,7 @@ namespace GameLauncherGUI
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
+            if(keyData==(Keys.Control|Keys.K)){OpenPalette();return true;}
             if (keyData == (Keys.Control | Keys.F)) { searchGames.Focus(); searchGames.SelectAll(); return true; }
             if (keyData == Keys.Escape) { if(searchGames.TextLength>0)searchGames.Clear();else ShowLibrary(false); return true; }
             return base.ProcessCmdKey(ref msg, keyData);
@@ -479,6 +487,7 @@ namespace GameLauncherGUI
             var copy = new ToolStripMenuItem("Скопировать путь запуска");
             foreach (var item in new[] { launch, pin, profile, folder, copy }) item.Padding = new Padding(10, 7, 10, 7);
             gameMenu.Items.AddRange(new ToolStripItem[] { launch, pin, profile, new ToolStripSeparator(), folder, copy });
+            gameMenu.Items.Insert(1,new ToolStripMenuItem("Управление игрой · копии и запуск…",null,(s,e)=>{if(SelectedGame is GameInfo game)OpenGameCare(game);}));
             gameMenu.Opening += (s, e) =>
             {
                 var game = SelectedGame;
@@ -556,7 +565,7 @@ namespace GameLauncherGUI
                 MessageBox.Show(this, $"Не удалось сохранить профиль:\n{ex.Message}", "Профиль игры", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-            RefreshList();
+            RefreshList(); Workspace.For(appDataFolder).History.Add(game,"Настройки",$"Профиль: цель {game.Performance.TargetFps} FPS; {game.Performance.WindowMode}; качество {game.Performance.Quality}; применение при запуске: {game.Performance.ApplyOnLaunch}");
             return true;
         }
 
@@ -713,7 +722,12 @@ namespace GameLauncherGUI
             
             try
             {
-                string[] modArguments = UnrealModLayout.LaunchArguments(game).Concat(GamePerformanceController.Prepare(game)).ToArray();
+                var readiness=await Task.Run(()=>GameReadiness.Inspect(game,()=>IsGameRunning(game),appDataFolder));
+                if(IsDisposed)return;
+                var blockers=readiness.Where(item=>item.Blocking).ToArray();if(blockers.Length>0){MessageBox.Show(this,string.Join("\n\n",blockers.Select(item=>item.Name+": "+item.Detail)),"Перед запуском нужно исправить",MessageBoxButtons.OK,MessageBoxIcon.Information);return;}
+                string[] customArguments=GameReadiness.Arguments(game.LaunchArguments);
+                if(game.Care?.BackupBeforeLaunch==true){lblStatus.Text="Создаём резервную копию перед запуском…";await Task.Run(()=>new GameBackupStore(game.Care,appDataFolder,()=>IsGameRunning(game)).Create("Перед запуском"));Workspace.For(appDataFolder).History.Add(game,"Копии","Создана резервная копия перед запуском");if(IsDisposed)return;}
+                string[] modArguments = UnrealModLayout.LaunchArguments(game).Concat(GamePerformanceController.Prepare(game)).Concat(customArguments).ToArray();
                 if (!string.IsNullOrEmpty(game.SteamAppId))
                 {
                     lblStatus.Text = "Проверка клиента Steam...";
@@ -739,8 +753,8 @@ namespace GameLauncherGUI
                     string? strategyExecutable = StrategyModsManager.DirectExecutable(game);
                     if (strategyExecutable != null)
                     {
-                        Process.Start(new ProcessStartInfo { FileName = strategyExecutable,
-                            WorkingDirectory = Path.GetDirectoryName(strategyExecutable), Arguments = game.LaunchArguments, UseShellExecute = true });
+                        var strategyStart=new ProcessStartInfo { FileName = strategyExecutable,WorkingDirectory = Path.GetDirectoryName(strategyExecutable),UseShellExecute = true };
+                        foreach(string argument in modArguments)strategyStart.ArgumentList.Add(argument);Process.Start(strategyStart);
                     }
                     else if (modArguments.Length > 0)
                     {
@@ -755,13 +769,14 @@ namespace GameLauncherGUI
                     ProcessStartInfo startInfo = new ProcessStartInfo
                     {
                         FileName = executable,
-                        Arguments = (game.LaunchArguments + " " + string.Join(" ", modArguments.Select(argument => "\"" + argument + "\""))).Trim(),
                         WorkingDirectory = Path.GetDirectoryName(executable),
                         UseShellExecute = true
                     };
+                    foreach(string argument in modArguments)startInfo.ArgumentList.Add(argument);
                     Process.Start(startInfo);
                 }
                 ArmTracking(game);
+                EnterGameMode(game);
                 if (RecordLaunch(game, DateTimeOffset.UtcNow)) lblStatus.Text = $"Запуск передан: {game.Name}";
             }
             catch (Exception ex)
@@ -787,7 +802,7 @@ namespace GameLauncherGUI
                 return false;
             }
             RefreshList();
-            return true;
+            Workspace.For(appDataFolder).History.Add(game,"Запуски","Запуск передан игровому клиенту или EXE"); return true;
         }
 
         private bool IsSteamRunning() => Process.GetProcessesByName("steam").Length > 0;

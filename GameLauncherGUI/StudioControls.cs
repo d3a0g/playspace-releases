@@ -9,7 +9,7 @@ internal class StudioDialog : Form
         if(keyData==Keys.Escape){Close();return true;}
         return base.ProcessCmdKey(ref msg,keyData);
     }
-    protected override void OnShown(EventArgs e){UiTypography.Apply(this);base.OnShown(e);}
+    protected override void OnShown(EventArgs e){UiTypography.Apply(this);PresentationOptions.Apply(this);base.OnShown(e);}
     protected Panel ContentHost { get; } = new() { Dock = DockStyle.Fill, BackColor = Color.FromArgb(14, 17, 27) };
     private readonly Label caption;
     public StudioDialog()

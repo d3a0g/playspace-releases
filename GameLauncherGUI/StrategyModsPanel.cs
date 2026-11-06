@@ -4,7 +4,7 @@ namespace GameLauncherGUI;
 
 internal sealed class StrategyModsPanel : UserControl
 {
-    private readonly StrategyModsManager manager;
+    private readonly StrategyModsManager manager; private readonly GameInfo historyGame;
     private readonly StrategyGameAdapter adapter;
     private readonly ListBox list = new() { Dock = DockStyle.Fill, BackColor = Color.FromArgb(23,28,42), ForeColor = Color.FromArgb(232,230,247), BorderStyle = BorderStyle.None, IntegralHeight = false, ItemHeight = 28 };
     private readonly TextBox details = new() { Dock = DockStyle.Fill, Multiline = true, ReadOnly = true, BackColor = Color.FromArgb(23,28,42), ForeColor = Color.FromArgb(182,193,217), BorderStyle = BorderStyle.None, ScrollBars = ScrollBars.Vertical };
@@ -22,7 +22,7 @@ internal sealed class StrategyModsPanel : UserControl
 
     public StrategyModsPanel(StrategyGameAdapter adapter, GameInfo game)
     {
-        this.adapter = adapter; manager = new StrategyModsManager(adapter, game);
+        historyGame=game; this.adapter = adapter; manager = new StrategyModsManager(adapter, game);
         BackColor = Color.FromArgb(14,17,27); ForeColor = Color.FromArgb(235,232,249); Font = new Font("Segoe UI",10); Dock = DockStyle.Fill;
         var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 4, Margin = Padding.Empty };
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100));
@@ -81,7 +81,7 @@ internal sealed class StrategyModsPanel : UserControl
     private async Task RunAsync(Func<string> work,string success)
     {
         if(busy)return;cancellation.Dispose();cancellation=new();SetBusy(true);
-        try{await Task.Run(work);entries=await Task.Run(manager.List);if(!IsDisposed){FillList();status.Text=success;}}
+        try{await Task.Run(work);Workspace.Current.History.Add(historyGame,"Моды",success);entries=await Task.Run(manager.List);if(!IsDisposed){FillList();status.Text=success;}}
         catch(OperationCanceledException){if(!IsDisposed)status.Text="Импорт отменён до применения файлов.";}
         catch(Exception ex){if(!IsDisposed)status.Text="Операция не выполнена: "+ex.Message;}
         finally{if(!IsDisposed)SetBusy(false);}

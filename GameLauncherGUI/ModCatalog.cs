@@ -71,6 +71,7 @@ internal sealed class ModCatalog : IDisposable
     public ModCatalog() => http.DefaultRequestHeaders.UserAgent.ParseAdd("Playspace/1.0");
     public async Task<List<ModPackage>> LoadAsync(ModGameAdapter adapter, CancellationToken cancellation)
     {
+        if(Workspace.Current.Offline)throw new IOException("Включён офлайн-режим. Используйте сохранённый каталог.");
         using var response = await http.GetAsync($"https://thunderstore.io/c/{adapter.Community}/api/v1/package/",
             HttpCompletionOption.ResponseHeadersRead, cancellation).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
@@ -104,25 +105,12 @@ internal sealed class ModCatalog : IDisposable
             catch (Exception) when (cancellation.IsCancellationRequested) { throw new OperationCanceledException(cancellation); }
         }, cancellation).ConfigureAwait(false);
     }
-    public async Task<byte[]> DownloadAsync(string url, CancellationToken cancellation)
+    public async Task<byte[]> DownloadAsync(string url, CancellationToken cancellation,string title="Мод Thunderstore")
     {
         var uri = new Uri(url);
         if (uri.Scheme != "https" || !(uri.Host.Equals("thunderstore.io", StringComparison.OrdinalIgnoreCase) || uri.Host.EndsWith(".thunderstore.io", StringComparison.OrdinalIgnoreCase)))
             throw new InvalidDataException("Архив должен находиться на Thunderstore.");
-        using var response = await http.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancellation);
-        response.EnsureSuccessStatusCode();
-        const long limit = 100L * 1024 * 1024;
-        if (response.Content.Headers.ContentLength > limit) throw new InvalidDataException("Архив больше 100 МБ. Для него нужен специализированный менеджер.");
-        await using var source = await response.Content.ReadAsStreamAsync(cancellation);
-        using var result = new MemoryStream();
-        var buffer = new byte[81920];
-        int read;
-        while ((read = await source.ReadAsync(buffer, cancellation)) > 0)
-        {
-            if (result.Length + read > limit) throw new InvalidDataException("Архив превышает 100 МБ.");
-            result.Write(buffer, 0, read);
-        }
-        return result.ToArray();
+        return await Workspace.Current.Transfers.Fetch(title,uri,100L*1024*1024,cancellation);
     }
     public void Dispose() => http.Dispose();
 }

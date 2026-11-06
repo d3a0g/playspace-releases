@@ -23,6 +23,7 @@ public partial class Form1
         tray = new NotifyIcon { Text = "PLAYSPACE", Icon = appIcon ?? SystemIcons.Application, ContextMenuStrip = menu, Visible = true };
         tray.DoubleClick += (s,e) => RestoreWindow();
         preferences=LauncherPreferences.Load(appDataFolder);
+        InitializeWorkspace();
         InitializeUpdates();
         FormClosing += HandleCloseChoice;
         sessionTimer.Tick += (s,e) => TickSessions();
@@ -85,16 +86,19 @@ public partial class Form1
         }
         double seconds = Math.Min(10,sessionClock.Elapsed.TotalSeconds); sessionClock.Restart();
         bool changed = false;bool sessionEnded=false;
+        foreach(var removed in sessions.Keys.Where(game=>!myGames.Contains(game)).ToArray()){sessions.Remove(removed);sessionStarted.Remove(removed);}
         foreach (var game in myGames.ToArray()) {
             bool running = MatchesGame(game,paths);
             if (running) {
+                if(!sessionStarted.ContainsKey(game))sessionStarted[game]=DateTimeOffset.UtcNow;
                 if (!sessions.TryGetValue(game,out var state)) state = (DateTime.UtcNow,true);
                 if (state.Seen) { game.PlayedSeconds += seconds; changed = true; }
                 else { game.LastLaunchUtc = DateTimeOffset.UtcNow; changed = true; }
                 sessions[game] = (state.Until,true);
-            } else if (sessions.TryGetValue(game,out var state) && (state.Seen || state.Until < DateTime.UtcNow)) {sessions.Remove(game);sessionEnded|=state.Seen;}
+            } else if (sessions.TryGetValue(game,out var state) && (state.Seen || state.Until < DateTime.UtcNow)) {sessions.Remove(game);sessionStarted.Remove(game);sessionEnded|=state.Seen;if(state.Seen)Workspace.For(appDataFolder).History.Add(game,"Сессии","Отслеживаемый процесс игры завершился");}
         }
         if(steamKey.Length>0 && (DateTimeOffset.UtcNow-lastSteamHoursAttempt>TimeSpan.FromMinutes(10) || sessionEnded && DateTimeOffset.UtcNow-lastSteamHoursAttempt>TimeSpan.FromSeconds(30))) _ = RefreshSteamHours();
+        UpdateGameMode(paths);
         if (changed) {
             try { SaveData(); UpdateSpotlight(SelectedGame); }
             catch (IOException) { lblStatus.Text = "Не удалось сохранить время игры; повторим при следующей проверке."; }
@@ -135,6 +139,7 @@ public partial class Form1
             try {
                 Directory.CreateDirectory(folder);
                 if (!File.Exists(file)) {
+                    if(Workspace.For(appDataFolder).Offline)return null;
                     using var response = await mediaClient.GetAsync($"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{id}/library_600x900_2x.jpg",HttpCompletionOption.ResponseHeadersRead);
                     response.EnsureSuccessStatusCode();
                     if (response.Content.Headers.ContentLength > 10*1024*1024) return null;

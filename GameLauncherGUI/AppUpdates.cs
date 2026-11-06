@@ -59,14 +59,25 @@ internal static class UpdateService
 }
 internal sealed class UpdateAvailableForm : StudioDialog
 {
+    internal static string FormatNotes(string? notes)
+    {
+        if(string.IsNullOrWhiteSpace(notes))return "Автор пока не добавил список изменений для этой версии.";
+        string text=notes.Replace("\r\n","\n").Replace('\r','\n').Trim();
+        text=System.Text.RegularExpressions.Regex.Replace(text,@"(?m)^[ \t]{0,3}#{1,6}[ \t]+(.+?)[ \t]*#*[ \t]*$",m=>m.Groups[1].Value.ToUpperInvariant());
+        text=System.Text.RegularExpressions.Regex.Replace(text,@"(?m)^[ \t]*[-*+][ \t]+","• ");
+        text=System.Text.RegularExpressions.Regex.Replace(text,@"\*\*(.+?)\*\*","$1");
+        return text.Replace("\n",Environment.NewLine);
+    }
     public UpdateAvailableForm(UpdateRelease release)
     {
-        Text="PLAYSPACE / Доступно обновление";Size=new Size(650,480);MinimumSize=new Size(580,400);
-        var layout=new TableLayoutPanel{Dock=DockStyle.Fill,ColumnCount=1,RowCount=4,Padding=new Padding(28)};layout.RowStyles.Add(new RowStyle(SizeType.Absolute,50));layout.RowStyles.Add(new RowStyle(SizeType.Absolute,36));layout.RowStyles.Add(new RowStyle(SizeType.Percent,100));layout.RowStyles.Add(new RowStyle(SizeType.Absolute,48));ContentHost.Controls.Add(layout);
+        Text="PLAYSPACE / Доступно обновление";Size=new Size(760,650);MinimumSize=new Size(580,480);
+        var layout=new TableLayoutPanel{Dock=DockStyle.Fill,ColumnCount=1,RowCount=5,Padding=new Padding(28)};layout.RowStyles.Add(new RowStyle(SizeType.Absolute,50));layout.RowStyles.Add(new RowStyle(SizeType.Absolute,36));layout.RowStyles.Add(new RowStyle(SizeType.Absolute,32));layout.RowStyles.Add(new RowStyle(SizeType.Percent,100));layout.RowStyles.Add(new RowStyle(SizeType.Absolute,56));ContentHost.Controls.Add(layout);
         layout.Controls.Add(new Label{Text="Новая версия PLAYSPACE",Font=new Font("Segoe UI",19,FontStyle.Bold),Dock=DockStyle.Fill},0,0);
         layout.Controls.Add(new Label{Text=$"Версия {UpdateService.DisplayVersion} → {release.Version}",Dock=DockStyle.Fill,ForeColor=Color.FromArgb(171,160,223)},0,1);
-        layout.Controls.Add(new TextBox{Text=string.IsNullOrWhiteSpace(release.Notes)?"Доступна новая версия приложения.":release.Notes,ReadOnly=true,Multiline=true,ScrollBars=ScrollBars.Vertical,Dock=DockStyle.Fill,BackColor=Color.FromArgb(23,28,42),ForeColor=Color.White,BorderStyle=BorderStyle.None},0,2);
-        var download=new ModernButton("Открыть загрузку обновления ↗",Color.FromArgb(115,94,244)){Dock=DockStyle.Fill};layout.Controls.Add(download,0,3);
+        layout.Controls.Add(new Label{Text="Что изменилось",Font=new Font("Segoe UI",11,FontStyle.Bold),Dock=DockStyle.Fill},0,2);
+        var card=new RoundedPanel{Dock=DockStyle.Fill,Margin=new Padding(0,0,0,12),Padding=new Padding(16)};
+        card.Controls.Add(new FormattedDescription{Text=FormatNotes(release.Notes),Dock=DockStyle.Fill,AccessibleName="Список изменений обновления"});layout.Controls.Add(card,0,3);
+        var download=new ModernButton("Открыть загрузку обновления ↗",Color.FromArgb(115,94,244)){Dock=DockStyle.Fill,Margin=new Padding(0,8,0,0)};layout.Controls.Add(download,0,4);
         download.Click+=(s,e)=>{try{System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(UpdateService.HttpsUrl(release.DownloadUrl).AbsoluteUri){UseShellExecute=true});}catch(Exception ex)when(ex is System.ComponentModel.Win32Exception or InvalidDataException){download.Text="Не удалось открыть ссылку";}};
     }
 }
@@ -103,6 +114,7 @@ public partial class Form1
     }
     private async Task CheckUpdates(bool manual)
     {
+        if(Workspace.For(appDataFolder).Offline){if(manual)lblStatus.Text="Офлайн-режим: проверка обновлений отключена. Измените режим в «Моё пространство → Вид».";return;}
         if(checkingUpdate||IsDisposed)return;
         string feed=FeedUrl;
         if(string.IsNullOrWhiteSpace(feed)){if(manual)lblStatus.Text="Канал обновлений ещё не настроен: укажи адрес latest.json в настройках приложения.";return;}

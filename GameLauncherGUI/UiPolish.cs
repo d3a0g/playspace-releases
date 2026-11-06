@@ -12,7 +12,7 @@ internal static class SmoothText
         var old=g.TextRenderingHint;g.TextRenderingHint=TextRenderingHint.AntiAliasGridFit;
         using var brush=new SolidBrush(color);using var format=new StringFormat {Alignment=flags.HasFlag(TextFormatFlags.HorizontalCenter)?StringAlignment.Center:flags.HasFlag(TextFormatFlags.Right)?StringAlignment.Far:StringAlignment.Near,LineAlignment=flags.HasFlag(TextFormatFlags.VerticalCenter)?StringAlignment.Center:StringAlignment.Near,Trimming=flags.HasFlag(TextFormatFlags.EndEllipsis)?StringTrimming.EllipsisCharacter:StringTrimming.None};
         if(!flags.HasFlag(TextFormatFlags.WordBreak))format.FormatFlags|=StringFormatFlags.NoWrap;
-        g.DrawString(text??"",font,brush,bounds,format);g.TextRenderingHint=old;
+        using var scaled=PresentationOptions.TextScale==1?null:new Font(font.FontFamily,font.Size*PresentationOptions.TextScale,font.Style);g.DrawString(text??"",scaled??font,brush,bounds,format);g.TextRenderingHint=old;
     }
     public static void Draw(Graphics g,string? text,Font font,Rectangle bounds,Color color,Color background,TextFormatFlags flags){using var brush=new SolidBrush(background);g.FillRectangle(brush,bounds);Draw(g,text,font,bounds,color,flags);}
 }

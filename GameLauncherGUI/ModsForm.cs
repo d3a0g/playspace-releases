@@ -65,6 +65,11 @@ internal sealed class ModsForm : StudioDialog
         gameRow.Controls.Add(new Label { Text = "ИГРА НА ЭТОМ ПК", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft,
             Font = new Font("Segoe UI", 8, FontStyle.Bold), ForeColor = Color.FromArgb(143, 152, 183) }, 0, 0);
         gameRow.ColumnCount=3;gameRow.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,142));
+        gameRow.ColumnCount=5;gameRow.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,132));gameRow.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,118));
+        var profileButton=new ModernButton("Наборы модов",Color.FromArgb(35,40,63)){Dock=DockStyle.Fill,Margin=new Padding(4,6,0,6)};
+        profileButton.Click+=async(s,e)=>{if(busy||gamePicker.SelectedItem is not GameChoice selected)return;try{var strategy=StrategyGameAdapter.For(selected.Game);if(strategy!=null){using var dialog=new StrategyProfilesForm(selected.Game,new StrategyModsManager(strategy,selected.Game));dialog.ShowDialog(this);await SelectGameAsync(false);return;}string? root=NativeModAdapter.For(selected.Game)?.Root(selected.Game)??ModGameAdapter.For(selected.Game)?.FindRoot(selected.Game);if(root==null){status.Text="Для игры нет поддерживаемой папки модов.";return;}using var profiles=new ModProfilesForm(selected.Game,root);profiles.ShowDialog(this);await SelectGameAsync(false);}catch(Exception ex)when(ex is IOException or InvalidDataException or UnauthorizedAccessException){status.Text=ex.Message;}};
+        gameRow.Controls.Add(profileButton,3,0);
+        var downloads=new ModernButton("Загрузки",Color.FromArgb(28,44,55)){Dock=DockStyle.Fill,Margin=new Padding(4,6,0,6)};downloads.Click+=(s,e)=>{using var dialog=new DownloadsForm(Workspace.Current.Transfers);dialog.ShowDialog(this);};gameRow.Controls.Add(downloads,4,0);
         var dlssButton=new ModernButton("✦  DLSS / RTX",Color.FromArgb(35,48,54)){Dock=DockStyle.Fill,Margin=new Padding(8,6,0,6)};
         dlssButton.Click+=(s,e)=>{if(gamePicker.SelectedItem is GameChoice selected){using var dialog=new DlssForm(selected.Game);dialog.ShowDialog(this);}};gameRow.Controls.Add(dlssButton,2,0);
         gamePicker.Margin = new Padding(0, 8, 0, 6); gameRow.Controls.Add(gamePicker, 1, 0); layout.Controls.Add(gameRow, 0, 1);
@@ -171,14 +176,17 @@ internal sealed class ModsForm : StudioDialog
             gameRoot = adapter.FindRoot(choice.Game);
             if (gameRoot != null) { installer = new ModInstaller(gameRoot); state = await Task.Run(installer.ReadState); }
             status.Text = "Загрузка каталога " + adapter.Name + "…";
-            if (!reload && cache.TryGetValue(adapter.Community, out var stored)) catalog = stored;
+            string storedCatalog=Path.Combine(Workspace.Current.Folder,"mod-catalog",adapter.Community+".json");
+            if(Workspace.Current.Offline){catalog=LocalJson.Read(storedCatalog,()=>new List<ModPackage>());status.Text=catalog.Count==0?"Офлайн-режим: каталог этой игры ещё не сохранён.":"Офлайн-режим: сохранённый каталог, доступность новых версий не проверялась.";}
+            else if (!reload && cache.TryGetValue(adapter.Community, out var stored)) catalog = stored;
             else
             {
                 catalog = await service.LoadAsync(adapter, cancellation.Token);
                 if (cache.Count >= 2 && !cache.ContainsKey(adapter.Community)) cache.Clear();
                 cache[adapter.Community] = catalog;
+                try{LocalJson.Write(storedCatalog,catalog);}catch(Exception ex)when(ex is IOException or UnauthorizedAccessException){}
             }
-            if (!IsDisposed) status.Text = $"{adapter.Name}: {catalog.Count} пакетов. Показаны первые 300 подходящих результатов; уточни поиск." +
+            if (!IsDisposed&&!Workspace.Current.Offline) status.Text = $"{adapter.Name}: {catalog.Count} пакетов. Показаны первые 300 подходящих результатов; уточни поиск." +
                 (gameRoot == null ? "\nПапка игры не подтверждена. Найди/добавь её exe в библиотеке для установки." : "\nПапка: " + gameRoot);
         }
         catch (OperationCanceledException) { if (!IsDisposed) status.Text = "Загрузка отменена. Нажми «Обновить», чтобы повторить."; }
@@ -253,6 +261,7 @@ internal sealed class ModsForm : StudioDialog
             if (plan != null) await installer.InstallAsync(plan, adapter, service, progress, cancellation.Token);
             else await Task.Run(() => installer.Uninstall(uninstall!));
             state = await Task.Run(installer.ReadState);
+            if(gamePicker.SelectedItem is GameChoice changed)Workspace.Current.History.Add(changed.Game,"Моды",plan!=null?"Установлены моды: "+string.Join(", ",plan.Select(item=>item.FullId)):"Удалён мод: "+uninstall);
             status.Text = adapter.IsUnreal ? "Готово. UE4SS-моды запускай кнопкой «Играть» в PLAYSPACE: она передаёт пути профиля загрузчику." :
                 "Готово. Запусти игру обычной кнопкой «Играть». Совместимость зависит от версии игры и модов.";
         }
