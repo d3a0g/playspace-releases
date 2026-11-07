@@ -1,13 +1,15 @@
-# LauncherPlaySpace 1.0.5
+# LauncherPlaySpace — скачать игровой лаунчер для Windows
 
 Авторские права (c) 2026 d3a0g  
 Copyright (c) 2026 d3a0g
 
-**Готовые сборки и обновления LauncherPlaySpace для Windows x64.**
+**Официальные сборки LauncherPlaySpace: бесплатный игровой лаунчер для Windows 10 и Windows 11 x64.**
 
 [Скачать последнюю версию](https://github.com/d3a0g/playspace-releases/releases/latest) · [Исходный код и документация](https://github.com/d3a0g/LauncherPlaySpace) · [Поддержка](https://t.me/PlaySpaceSupport_bot)
 
 Лаунчер объединяет библиотеку игр, статистику Steam, 500 рекомендаций, моды, сохранения и настройки производительности. Проект открыт под MIT.
+
+**English:** Official LauncherPlaySpace downloads for Windows: installer, portable application, source archive, release notes and checksums. The main source repository is [d3a0g/LauncherPlaySpace](https://github.com/d3a0g/LauncherPlaySpace).
 
 ## Установка
 
