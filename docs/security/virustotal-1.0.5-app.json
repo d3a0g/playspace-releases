@@ -1,0 +1,470 @@
+{
+    "FileName":  "LauncherPlaySpace.exe",
+    "SHA256":  "12b2baf94694271a7b7582026048c7e1f8341079a86111561e12699555d2bb0b",
+    "AnalysisUTC":  "2026-11-07 10:19 UTC",
+    "RetrievedUTC":  "2026-11-07T10:29:30.9933892+00:00",
+    "Source":  "https://www.virustotal.com/gui/file/12b2baf94694271a7b7582026048c7e1f8341079a86111561e12699555d2bb0b",
+    "Stats":  {
+                  "malicious":  0,
+                  "suspicious":  0,
+                  "undetected":  68,
+                  "harmless":  0,
+                  "timeout":  1,
+                  "confirmed-timeout":  1,
+                  "failure":  1,
+                  "type-unsupported":  4
+              },
+    "EngineResults":  [
+                          {
+                              "Engine":  "Bkav",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Lionic",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "MicroWorld-eScan",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "ClamAV",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "CTX",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "CAT-QuickHeal",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261106"
+                          },
+                          {
+                              "Engine":  "Skyhigh",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261106"
+                          },
+                          {
+                              "Engine":  "ALYac",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Malwarebytes",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "VIPRE",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261106"
+                          },
+                          {
+                              "Engine":  "Sangfor",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "K7AntiVirus",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Alibaba",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20190527"
+                          },
+                          {
+                              "Engine":  "K7GW",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "CrowdStrike",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20230417"
+                          },
+                          {
+                              "Engine":  "Arcabit",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "VirIT",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261106"
+                          },
+                          {
+                              "Engine":  "Symantec",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261106"
+                          },
+                          {
+                              "Engine":  "ESET-NOD32",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "APEX",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "TrendMicro-HouseCall",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Paloalto",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Cynet",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Kaspersky",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "BitDefender",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "NANO-Antivirus",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "SUPERAntiSpyware",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Rising",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Emsisoft",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "F-Secure",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "DrWeb",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Zillya",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261106"
+                          },
+                          {
+                              "Engine":  "TrendMicro",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "McAfeeD",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "SentinelOne",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20260924"
+                          },
+                          {
+                              "Engine":  "Trapmine",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261026"
+                          },
+                          {
+                              "Engine":  "CMC",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261106"
+                          },
+                          {
+                              "Engine":  "Sophos",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Ikarus",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Jiangmin",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261106"
+                          },
+                          {
+                              "Engine":  "Webroot",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20250227"
+                          },
+                          {
+                              "Engine":  "Avira",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Antiy-AVL",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Kingsoft",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Gridinsoft",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Xcitium",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261106"
+                          },
+                          {
+                              "Engine":  "Microsoft",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "ViRobot",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "ZoneAlarm",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "GData",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Google",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "AhnLab-V3",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Acronis",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20240328"
+                          },
+                          {
+                              "Engine":  "VBA32",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "TACHYON",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "DeepInstinct",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20260614"
+                          },
+                          {
+                              "Engine":  "Cylance",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261103"
+                          },
+                          {
+                              "Engine":  "Panda",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Zoner",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Tencent",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Yandex",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261106"
+                          },
+                          {
+                              "Engine":  "TrellixENS",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261106"
+                          },
+                          {
+                              "Engine":  "huorong",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261106"
+                          },
+                          {
+                              "Engine":  "MaxSecure",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261106"
+                          },
+                          {
+                              "Engine":  "Fortinet",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "AVG",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261106"
+                          },
+                          {
+                              "Engine":  "Avast",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20261106"
+                          },
+                          {
+                              "Engine":  "alibabacloud",
+                              "Category":  "undetected",
+                              "Result":  null,
+                              "Updated":  "20250321"
+                          },
+                          {
+                              "Engine":  "Varist",
+                              "Category":  "timeout",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "tehtris",
+                              "Category":  "confirmed-timeout",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "Elastic",
+                              "Category":  "failure",
+                              "Result":  null,
+                              "Updated":  "20261104"
+                          },
+                          {
+                              "Engine":  "Trustlook",
+                              "Category":  "type-unsupported",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          },
+                          {
+                              "Engine":  "SymantecMobileInsight",
+                              "Category":  "type-unsupported",
+                              "Result":  null,
+                              "Updated":  "20260123"
+                          },
+                          {
+                              "Engine":  "BitDefenderFalx",
+                              "Category":  "type-unsupported",
+                              "Result":  null,
+                              "Updated":  "20261022"
+                          },
+                          {
+                              "Engine":  "Avast-Mobile",
+                              "Category":  "type-unsupported",
+                              "Result":  null,
+                              "Updated":  "20261107"
+                          }
+                      ],
+    "Notice":  "API report summary. Detections are shown without omission. Undetected does not guarantee safety."
+}
