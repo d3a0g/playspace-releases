@@ -20,17 +20,19 @@ $releaseExists=$LASTEXITCODE -eq 0
 $ErrorActionPreference=$oldErrorPreference
 if($releaseExists){throw "Выпуск v$Version уже существует. Используйте новую версию."}
 $feed="https://github.com/$Repository/releases/latest/download/latest.json"
-$download="https://github.com/$Repository/releases/download/v$Version/LauncherPlaySpace-$Version-win-x64.zip"
+$download="https://github.com/$Repository/releases/download/v$Version/LauncherPlaySpace-$Version-Setup.exe"
 & (Join-Path $PSScriptRoot 'Publish-Release.ps1') -Version $Version -FeedUrl $feed -DownloadUrl $download -Notes $Notes
 $folder=Join-Path $workspace "artifacts/releases/$Version"
 $archive=Join-Path $folder "LauncherPlaySpace-$Version-win-x64.zip"
+$installer=Join-Path $folder "LauncherPlaySpace-$Version-Setup.exe"
 $manifest=Join-Path $folder 'latest.json'
 $checksums=Join-Path $folder 'SHA256SUMS.txt'
 $notesFile=Join-Path $folder 'release-notes.md'
 $hash=(Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
-"$hash  LauncherPlaySpace-$Version-win-x64.zip"|Set-Content -LiteralPath $checksums -Encoding ASCII
+$installerHash=(Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash.ToLowerInvariant()
+@("$hash  LauncherPlaySpace-$Version-win-x64.zip","$installerHash  LauncherPlaySpace-$Version-Setup.exe")|Set-Content -LiteralPath $checksums -Encoding ASCII
 [IO.File]::WriteAllText($notesFile,$Notes)
-& $gh release create "v$Version" $archive $manifest $checksums --repo $Repository --draft --title "LauncherPlaySpace $Version" --notes-file $notesFile
+& $gh release create "v$Version" $installer $archive $manifest $checksums --repo $Repository --draft --title "LauncherPlaySpace $Version" --notes-file $notesFile
 if($LASTEXITCODE -ne 0){throw 'Загрузка не завершена. Выпуск остаётся черновиком; предыдущий канал обновления не менялся.'}
 & $gh release edit "v$Version" --repo $Repository --draft=false --latest
 if($LASTEXITCODE -ne 0){throw 'Файлы загружены, но публикация черновика не завершена.'}

@@ -7,7 +7,7 @@ param(
 $ErrorActionPreference='Stop'
 if($Notes -and $NotesFile){throw 'Use either Notes or NotesFile, not both.'}
 if(-not $Notes){
-    if(-not $NotesFile){$NotesFile=Join-Path (Split-Path -Parent $PSScriptRoot) "GameLauncherGUI/release-notes/$Version.md"}
+    if(-not $NotesFile){$NotesFile=Join-Path (Split-Path -Parent $PSScriptRoot) "docs/releases/$Version.md"}
     if(-not(Test-Path -LiteralPath $NotesFile -PathType Leaf)){throw "Release notes required. Create $NotesFile or pass -NotesFile / -Notes."}
     $Notes=[IO.File]::ReadAllText((Resolve-Path -LiteralPath $NotesFile).Path)
 }

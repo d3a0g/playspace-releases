@@ -1,0 +1,18 @@
+using System.Reflection;
+using System.Runtime.InteropServices;
+using GameLauncherGUI;
+
+internal static class ShortcutChecks
+{
+    internal static void Run(bool ui)
+    {
+        int count=0;void Check(bool value,string message){if(!value)throw new Exception(message);count++;}
+        void Reject(Action work){try{work();}catch(Exception ex)when(ex is IOException or ArgumentException){count++;return;}throw new Exception("Unexpected shortcut target accepted");}
+        string folder=Path.Combine(Path.GetTempPath(),"PlaySpaceShortcutChecks-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(folder);string exe=Path.Combine(folder,"LauncherPlaySpace.exe");File.WriteAllText(exe,"fixture-not-executable");string marker="[ZoneTransfer]\r\nZoneId=3\r\n";File.WriteAllText(exe+":Zone.Identifier",marker);
+        Reject(()=>LauncherShortcuts.ValidateTarget("LauncherPlaySpace.exe"));Reject(()=>LauncherShortcuts.ValidateTarget(Path.Combine(folder,"dotnet.exe")));Reject(()=>LauncherShortcuts.ValidateTarget(Path.Combine(folder,"missing","LauncherPlaySpace.exe")));Reject(()=>LauncherShortcuts.ValidateTarget("\\\\server\\share\\LauncherPlaySpace.exe"));
+        string destination=Path.Combine(folder,"shortcuts");string first=LauncherShortcuts.Create(exe,destination);Check(File.Exists(first),"Shortcut not created");File.WriteAllText(first+":Zone.Identifier",marker);byte[] before=File.ReadAllBytes(first);string second=LauncherShortcuts.Create(exe,destination);Check(first!=second&&File.Exists(second),"Existing shortcut overwritten");Check(File.ReadAllBytes(first).SequenceEqual(before)&&File.ReadAllText(first+":Zone.Identifier")==marker,"Existing downloaded shortcut changed");Check(File.ReadAllText(exe+":Zone.Identifier")==marker,"EXE internet-origin metadata removed");
+        object? shell=null,shortcut=null;try{var type=Type.GetTypeFromProgID("WScript.Shell")!;shell=Activator.CreateInstance(type);shortcut=type.InvokeMember("CreateShortcut",BindingFlags.InvokeMethod,null,shell,new object[]{second})!;string Get(string name)=>(string)shortcut.GetType().InvokeMember(name,BindingFlags.GetProperty,null,shortcut,null)!;Check(Path.GetFullPath(Get("TargetPath")).Equals(exe,StringComparison.OrdinalIgnoreCase),"Shortcut targets wrong executable");Check(Get("Arguments")==""&&Get("WorkingDirectory").Equals(folder,StringComparison.OrdinalIgnoreCase),"Unexpected arguments or working directory");}finally{if(shortcut!=null)Marshal.FinalReleaseComObject(shortcut);if(shell!=null)Marshal.FinalReleaseComObject(shell);}
+        if(ui){int clicks=0;using var form=new SettingsForm("","",(_,_,_,_)=>Task.CompletedTask,()=>{},createShortcut:desktop=>{clicks++;return second;});form.Show();Application.DoEvents();IEnumerable<Control> Children(Control parent)=>parent.Controls.Cast<Control>().SelectMany(child=>new[]{child}.Concat(Children(child)));Children(form).OfType<ModernButton>().Single(button=>button.Text=="Ярлыки").PerformClick();Children(form).OfType<ModernButton>().Single(button=>button.Text=="Ярлык на рабочем столе").PerformClick();Check(clicks==1&&Children(form).OfType<Label>().Any(label=>label.Text.Contains("Создан новый ярлык")),"Settings shortcut action missing");Children(form).OfType<ModernButton>().Single(button=>button.Text=="Ярлык в меню «Пуск»").PerformClick();Check(clicks==2,"Start menu shortcut action missing");}
+        Console.WriteLine($"PASS: {count} shortcut checks: absolute launcher target, no arguments, fresh link/no overwrite, original internet-zone metadata preserved"+(ui?", settings buttons":"")+". Temporary fixtures only; no taskbar pins or security policies changed.");
+    }
+}

@@ -1,0 +1,232 @@
+[
+  {
+    "SteamId": "2784470",
+    "Name": "9 Kings",
+    "Community": "9-kings",
+    "Executable": "9Kings.exe",
+    "Loader": "BepInEx-BepInExPack_IL2CPP",
+    "UnrealProject": null,
+    "DataFolder": "9Kings_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "1629520",
+    "Name": "A Little to the Left",
+    "Community": "a-little-to-the-left",
+    "Executable": "A Little To The Left.exe",
+    "Loader": "BepInEx-BepInExPack_IL2CPP",
+    "UnrealProject": null,
+    "DataFolder": "A Little To The Left_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "945360",
+    "Name": "Among Us",
+    "Community": "among-us",
+    "Executable": "Among Us.exe",
+    "Loader": "BepInEx-BepInExPack_AmongUs",
+    "UnrealProject": null,
+    "DataFolder": "Among Us_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "949230",
+    "Name": "Cities: Skylines II",
+    "Community": "cities-skylines-ii",
+    "Executable": "Cities2.exe",
+    "Loader": "BepInEx-BepInExPack",
+    "UnrealProject": null,
+    "DataFolder": "CitiesSkylines2_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "268910",
+    "Name": "Cuphead",
+    "Community": "cuphead",
+    "Executable": "Cuphead.exe",
+    "Loader": "BepInEx-BepInExPack",
+    "UnrealProject": null,
+    "DataFolder": "Cuphead_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "2321470",
+    "Name": "Deep Rock Galactic: Survivor",
+    "Community": "deep-rock-galactic-survivor",
+    "Executable": "DRG Survivor.exe",
+    "Loader": "BepInEx-BepInExPack_IL2CPP",
+    "UnrealProject": null,
+    "DataFolder": "DRG Survivor_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "1562430",
+    "Name": "DREDGE",
+    "Community": "dredge",
+    "Executable": "DREDGE.exe",
+    "Loader": "BepInEx-BepInExPack_x86",
+    "UnrealProject": null,
+    "DataFolder": "DREDGE_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "311690",
+    "Name": "Enter the Gungeon",
+    "Community": "enter-the-gungeon",
+    "Executable": "EtG.exe",
+    "Loader": "BepInEx-BepInExPack_EtG",
+    "UnrealProject": null,
+    "DataFolder": "EtG_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "4358690",
+    "Name": "Graveyard Keeper 2",
+    "Community": "graveyard-keeper-2",
+    "Executable": "GraveyardKeeper2.exe",
+    "Loader": "BepInEx-BepInExPack",
+    "UnrealProject": null,
+    "DataFolder": "GraveyardKeeper2_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "1030300",
+    "Name": "Hollow Knight: Silksong",
+    "Community": "hollow-knight-silksong",
+    "Executable": "Hollow Knight Silksong.exe",
+    "Loader": "silksong_modding-BepInExPack_Silksong",
+    "UnrealProject": null,
+    "DataFolder": "Hollow Knight Silksong_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "4001890",
+    "Name": "How to Fish",
+    "Community": "how-to-fish",
+    "Executable": "How to Fish.exe",
+    "Loader": "BepInEx-BepInExPack",
+    "UnrealProject": null,
+    "DataFolder": "How to Fish_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "477160",
+    "Name": "Human Fall Flat",
+    "Community": "human-fall-flat",
+    "Executable": "Human.exe",
+    "Loader": "BepInEx-BepInExPack_HumanFallFlat",
+    "UnrealProject": null,
+    "DataFolder": "Human_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "2742830",
+    "Name": "Monster Train 2",
+    "Community": "monster-train-2",
+    "Executable": "MonsterTrain2.exe",
+    "Loader": "BepInEx-BepInExPack",
+    "UnrealProject": null,
+    "DataFolder": "MonsterTrain2_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "1809540",
+    "Name": "Nine Sols",
+    "Community": "nine-sols",
+    "Executable": "NineSols.exe",
+    "Loader": "BepInEx-BepInExPack",
+    "UnrealProject": null,
+    "DataFolder": "Nine Sols_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "648800",
+    "Name": "Raft",
+    "Community": "raft",
+    "Executable": "Raft.exe",
+    "Loader": "BepInEx-BepInExPack",
+    "UnrealProject": null,
+    "DataFolder": "Raft_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "774181",
+    "Name": "Rhythm Doctor",
+    "Community": "rhythm-doctor",
+    "Executable": "Rhythm Doctor.exe",
+    "Loader": "BepInEx-BepInExPack",
+    "UnrealProject": null,
+    "DataFolder": "Rhythm Doctor_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "1326470",
+    "Name": "Sons Of The Forest",
+    "Community": "sons-of-the-forest",
+    "Executable": "SonsOfTheForest.exe",
+    "Loader": "BepInEx-BepInExPack_IL2CPP",
+    "UnrealProject": null,
+    "DataFolder": "SonsOfTheForest_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "264710",
+    "Name": "Subnautica",
+    "Community": "subnautica",
+    "Executable": "Subnautica.exe",
+    "Loader": "Subnautica_Modding-BepInExPack",
+    "UnrealProject": null,
+    "DataFolder": "Subnautica_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "2124120",
+    "Name": "SULFUR",
+    "Community": "sulfur",
+    "Executable": "Sulfur.exe",
+    "Loader": "BepInEx-BepInExPack",
+    "UnrealProject": null,
+    "DataFolder": "Sulfur_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "1284190",
+    "Name": "The Planet Crafter",
+    "Community": "the-planet-crafter",
+    "Executable": "Planet Crafter.exe",
+    "Loader": "BepInEx-BepInExPack",
+    "UnrealProject": null,
+    "DataFolder": "ThePlanetCrafter_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "1059990",
+    "Name": "Trombone Champ",
+    "Community": "trombone-champ",
+    "Executable": "TromboneChamp.exe",
+    "Loader": "BepInEx-BepInExPack_TromboneChamp",
+    "UnrealProject": null,
+    "DataFolder": "TromboneChamp_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "1604030",
+    "Name": "V Rising",
+    "Community": "v-rising",
+    "Executable": "VRising.exe",
+    "Loader": "BepInEx-BepInExPack_V_Rising",
+    "UnrealProject": null,
+    "DataFolder": "VRising_Data",
+    "IsUnreal": false
+  },
+  {
+    "SteamId": "3195790",
+    "Name": "White Knuckle",
+    "Community": "white-knuckle",
+    "Executable": "White Knuckle.exe",
+    "Loader": "BepInEx-BepInExPack",
+    "UnrealProject": null,
+    "DataFolder": "White Knuckle_Data",
+    "IsUnreal": false
+  }
+]

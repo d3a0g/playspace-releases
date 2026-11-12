@@ -10,20 +10,15 @@ internal sealed class Configuration
     public long OwnerChatId{get;set;}
     public string PairingCode{get;set;}="";
     public string? ProxyUrl{get;set;}
+    public List<SupportOperator> Operators{get;set;}=new();
+    public List<OperatorInvite> OperatorInvites{get;set;}=new();
 }
 internal sealed partial class Bot
 {
     private static readonly JsonSerializerOptions ApiJson=new(){DefaultIgnoreCondition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull};
     private readonly Configuration configuration;private readonly HttpClient http;private readonly string folder,configFile;private long offset;private readonly Dictionary<long,DateTimeOffset> cooldown=new();
     public Bot(Configuration configuration,string configFile,HttpClient? client=null){this.configuration=configuration;this.configFile=configFile;folder=Path.GetDirectoryName(configFile)!;http=client??CreateHttp(configuration);LoadTickets();}
-    private static HttpClient CreateHttp(Configuration configuration)
-    {
-        var handler=new HttpClientHandler();
-        if(!string.IsNullOrWhiteSpace(configuration.ProxyUrl)){
-            var uri=new Uri(configuration.ProxyUrl);if(uri.Scheme!="http"&&uri.Scheme!="https"&&uri.Scheme!="socks5")throw new IOException("Unsupported proxy scheme.");handler.Proxy=new System.Net.WebProxy(uri);handler.UseProxy=true;
-        }
-        return new HttpClient(handler){Timeout=TimeSpan.FromSeconds(50)};
-    }
+    private static HttpClient CreateHttp(Configuration configuration)=>BotTransport.CreateHttp(configuration.ProxyUrl);
     private string Url(string method)=>$"https://api.telegram.org/bot{configuration.Token}/{method}";
     private async Task<JsonObject> Call(string method,object payload,CancellationToken cancellation)
     {
@@ -40,11 +35,11 @@ internal sealed partial class Bot
     public async Task Run(CancellationToken cancellation)
     {
                 JsonObject me;
-        while(true){try{me=await Call("getMe",new{},cancellation);break;}catch(Exception ex)when(ex is HttpRequestException or IOException or TaskCanceledException){if(cancellation.IsCancellationRequested)return;Console.WriteLine("Telegram temporarily unavailable; retrying connection.");await Task.Delay(5000,cancellation);}}
+        while(true){try{me=await Call("getMe",new{},cancellation);break;}catch(Exception ex)when(ex is HttpRequestException or IOException or TaskCanceledException or JsonException){if(cancellation.IsCancellationRequested)return;Console.WriteLine("Telegram temporarily unavailable; retrying connection.");await Task.Delay(5000,cancellation);}}
         if(!string.Equals(me["result"]?["username"]?.GetValue<string>(),"PlaySpaceSupport_bot",StringComparison.OrdinalIgnoreCase))throw new IOException("Unexpected bot username.");
         Console.WriteLine("Support bot connected: @"+me["result"]?["username"]);
         if(configuration.OwnerChatId==0&&string.IsNullOrEmpty(configuration.PairingCode)){configuration.PairingCode=Convert.ToHexString(RandomNumberGenerator.GetBytes(8));Save();}
-        await ConfigureMenus(cancellation);
+        while(true){try{await ConfigureMenus(cancellation);break;}catch(Exception ex)when(ex is HttpRequestException or IOException or TaskCanceledException or JsonException){if(cancellation.IsCancellationRequested)return;Console.WriteLine("Telegram menu setup unavailable; retrying.");await Task.Delay(5000,cancellation);}}
         string state=Path.Combine(folder,"support-bot-offset.txt");if(File.Exists(state))long.TryParse(File.ReadAllText(state),out offset);
         while(!cancellation.IsCancellationRequested){
             try {
@@ -69,7 +64,10 @@ internal static class Program
             var configuration=JsonSerializer.Deserialize<Configuration>(await File.ReadAllTextAsync(file),new JsonSerializerOptions{PropertyNameCaseInsensitive=true})??throw new IOException();
             string? environment=Environment.GetEnvironmentVariable("PLAYSPACE_BOT_TOKEN");if(!string.IsNullOrWhiteSpace(environment))configuration.Token=environment;
             if(string.IsNullOrWhiteSpace(configuration.Token)){Console.WriteLine("Set bot token in the private config or PLAYSPACE_BOT_TOKEN. Never include it in the launcher.");Environment.ExitCode=2;return;}
-            using var cancellation=new CancellationTokenSource();Console.CancelKeyPress+=(s,e)=>{e.Cancel=true;cancellation.Cancel();};await new Bot(configuration,file).Run(cancellation.Token);
+            using var cancellation=new CancellationTokenSource();Console.CancelKeyPress+=(s,e)=>{e.Cancel=true;cancellation.Cancel();};
+            if(args.Contains("--check-connection")){Environment.ExitCode=await BotTransport.Check(configuration,cancellation.Token)?0:3;return;}
+            Console.WriteLine(string.IsNullOrWhiteSpace(configuration.ProxyUrl)?"Network route: direct (no system proxy).":"Network route: configured proxy (no direct fallback).");
+            await new Bot(configuration,file).Run(cancellation.Token);
         }catch(OperationCanceledException){}
         catch{Console.WriteLine("Support bot could not start. Check private configuration and network. Tokens are never printed.");Environment.ExitCode=1;}
     }

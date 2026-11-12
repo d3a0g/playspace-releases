@@ -14,3 +14,5 @@ support-tickets.local.json.tmp
 support-bot-offset.txt
 support-bot.pid
 distribution/profile/
+
+.backups/

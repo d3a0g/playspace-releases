@@ -13,14 +13,24 @@
     <Product>LauncherPlaySpace</Product>
     <Title>LauncherPlaySpace</Title>
     <Description>Библиотека игр, статистика Steam, рекомендации и управление модами.</Description>
-    <Version>1.0.4</Version>
+    <Version>1.0.6</Version>
+    <Copyright>Авторские права (c) 2026 d3a0g / Copyright (c) 2026 d3a0g</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Assets/benchmarks-expanded.json" LogicalName="LauncherPlaySpace.Benchmarks" />
+    <EmbeddedResource Include="Assets/steam-hardware.json" LogicalName="LauncherPlaySpace.SteamHardware" />
+    <EmbeddedResource Include="Assets/changelog.json" LogicalName="LauncherPlaySpace.Changelog" />
+    <EmbeddedResource Include="Assets/ThirdParty/OptiScaler-GPL-3.0.txt" LogicalName="LauncherPlaySpace.OptiScalerLicense" />
+    <EmbeddedResource Include="Assets/ThirdParty/NVIDIA-DLSS-LICENSE.txt" LogicalName="LauncherPlaySpace.NvidiaDlssLicense" />
+    <EmbeddedResource Include="Assets/ThirdParty/SharpCompress-LICENSE.txt" LogicalName="LauncherPlaySpace.SharpCompressLicense" />
+    <None Update="Assets/ThirdParty/*.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <EmbeddedResource Include="Assets/recommendations-extra.json" LogicalName="LauncherPlaySpace.Recommendations" />
+    <EmbeddedResource Include="Assets/mod-adapters-extra.json" LogicalName="LauncherPlaySpace.ModAdapters" />
     <None Update="update-source.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <EmbeddedResource Include="Assets\playspace.ico" LogicalName="GameLauncherGUI.AppIcon" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="SharpCompress" Version="0.50.8" />
   </ItemGroup>
 
 </Project>

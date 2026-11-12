@@ -23,7 +23,7 @@ WARP устанавливается отдельно по вашему дейс�
 Приложение не отключает защиту Windows и не имеет подписи доверенным сертификатом издателя.
 
 Исходники и полные инструкции: https://github.com/d3a0g/LauncherPlaySpace
-Изменения: https://github.com/d3a0g/LauncherPlaySpace/blob/main/GameLauncherGUI/release-notes/1.0.4.md
+Изменения: https://github.com/d3a0g/LauncherPlaySpace/blob/main/docs/releases/1.0.4.md
 Поддержка: https://t.me/PlaySpaceSupport_bot
 
 Оригинальный код — MIT. Сторонние компоненты сохраняют свои лицензии: LICENSE и THIRD_PARTY_NOTICES.md.

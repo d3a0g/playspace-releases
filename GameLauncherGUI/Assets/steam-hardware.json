@@ -1,0 +1,164 @@
+{
+    "Ram":  [
+                {
+                    "Share":  41.42,
+                    "Name":  "16 GB"
+                },
+                {
+                    "Share":  37.06,
+                    "Name":  "32 GB"
+                },
+                {
+                    "Share":  7.52,
+                    "Name":  "8 GB"
+                }
+            ],
+    "Source":  "https://store.steampowered.com/hwsurvey/",
+    "HtmlSHA256":  "7B040DEFD9B8F137A9FE80FA79E3FBFF05B1AA1DD9FD71C3CEA356C8284B7DB5",
+    "Gpus":  [
+                 {
+                     "Name":  "NVIDIA GeForce RTX 3060",
+                     "Share":  3.62
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 5070",
+                     "Share":  3.56
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 4060 Laptop GPU",
+                     "Share":  3.4
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 4060",
+                     "Share":  3.32
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 3050",
+                     "Share":  3.06
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 5060",
+                     "Share":  2.97
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 5060 Ti",
+                     "Share":  2.55
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 5060 Laptop GPU",
+                     "Share":  2.52
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce GTX 1650",
+                     "Share":  2.32
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 4060 Ti",
+                     "Share":  2.17
+                 },
+                 {
+                     "Name":  "Apple M2",
+                     "Share":  2.14
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 3060 Ti",
+                     "Share":  2.03
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 3070",
+                     "Share":  1.9
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 5070 Ti",
+                     "Share":  1.81
+                 },
+                 {
+                     "Name":  "Intel Iris Xe Graphics",
+                     "Share":  1.73
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 5080",
+                     "Share":  1.68
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 4050 Laptop GPU",
+                     "Share":  1.67
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 3060 Laptop GPU",
+                     "Share":  1.65
+                 },
+                 {
+                     "Name":  "AMD Radeon Graphics",
+                     "Share":  1.64
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 4070",
+                     "Share":  1.63
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 2060",
+                     "Share":  1.55
+                 },
+                 {
+                     "Name":  "AMD Radeon RX 9070 XT",
+                     "Share":  1.49
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce GTX 1060",
+                     "Share":  1.39
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 4070 SUPER",
+                     "Share":  1.35
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce GTX 1660 SUPER",
+                     "Share":  1.33
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 3080",
+                     "Share":  1.32
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce GTX 1050 Ti",
+                     "Share":  1.09
+                 },
+                 {
+                     "Name":  "AMD Radeon(TM) Graphics",
+                     "Share":  0.95
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 4070 Laptop GPU",
+                     "Share":  0.87
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 3070 Ti",
+                     "Share":  0.86
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 4070 Ti",
+                     "Share":  0.85
+                 },
+                 {
+                     "Name":  "AMD Radeon RX 9060 XT",
+                     "Share":  0.83
+                 }
+             ],
+    "Cores":  [
+                  {
+                      "Share":  27.29,
+                      "Name":  "6 cores"
+                  },
+                  {
+                      "Share":  28.68,
+                      "Name":  "8 cores"
+                  },
+                  {
+                      "Share":  12.36,
+                      "Name":  "4 cores"
+                  }
+              ],
+    "Month":  "October 2026",
+    "Captured":  "2026-11-07"
+}

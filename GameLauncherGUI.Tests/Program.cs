@@ -32,6 +32,27 @@ internal static class Program
     [STAThread]
     private static void Main(string[] args)
     {
+        if(args.Contains("--launcher-updater")){LauncherUpdaterChecks.Run();return;}
+        if(args.Contains("--studio-controls")){StudioControlsChecks.Run();return;}
+        if(args.Contains("--ui-review")){UiReviewChecks.Run();return;}
+        if(args.Contains("--rtx30")){Rtx30Checks.Run(args.Contains("--ui"));return;}
+        if(args.Contains("--compatibility")){CompatibilityChecks.Run(args.Contains("--ui"));return;}
+        if(args.Contains("--async-audit")){AsyncAuditChecks.Run();return;}
+        if(args.Contains("--concurrency")){ConcurrencyChecks.Run();return;}
+        if(args.Contains("--experience")){ExperienceChecks.Run(args.Contains("--ui"));return;}
+        if(args.Contains("--update-help")){UpdateHelpChecks.Run(args.Contains("--ui"));return;}
+        if(args.Contains("--library-presentation")){LibraryPresentationChecks.Run();return;}
+        if(args.Contains("--updates")){UpdateChecks.Run(args.Contains("--ui"));return;}
+        if(args.Contains("--motion")){MotionChecks.Run();return;}
+        if(args.Contains("--desktop-library")){DesktopLibraryChecks.Run();return;}
+        if(args.Contains("--hardware")){HardwareCatalogChecks.Run(args.Contains("--ui"));return;}
+        if(args.Contains("--redesign")){RedesignChecks.Run(args.Contains("--ui"));return;}
+        if(args.Contains("--import-hardware-evidence")){HardwareEvidenceImport.Run();return;}
+        if(args.Contains("--verify-rtx-package")){Rtx30Checks.VerifyPackage();return;}
+        if(args.Contains("--verify-rtx-install")){Rtx30Checks.VerifyInstall().GetAwaiter().GetResult();return;}
+        if(args.Contains("--expanded-mods")){ModExpansionChecks.Run();return;}
+        if(args.Contains("--verify-mod-expansion")){ModExpansionVerification.Run();return;}
+        if(args.Contains("--launcher-health")){LauncherHealthChecks.Run(args.Contains("--ui"));return;}
         if(args.Contains("--support-bot")){SupportBotChecks.Run();return;}
         if(args.Contains("--network-ui")){NetworkChecks.Run(true);return;}
         if(args.Contains("--diagnostics-ui")){DiagnosticChecks.Run(true);return;}
@@ -44,6 +65,7 @@ internal static class Program
             var header=new byte[8];using(var input=File.OpenRead(file))input.ReadExactly(header);WarpInstaller.ValidateHeader(header);
             Console.WriteLine("PASS: actual official Cloudflare MSI format and Authenticode publisher verified by launcher code. No installation or network changes.");return;
         }
+        if(args.Contains("--bot-previews")){SupportBotPreviews.Run();return;}
         if(args.Contains("--public-screenshots")){PublicScreenshots.Run();return;}
         if(args.Contains("--verify-universal-dlss5")){UniversalDlss5Checks.VerifyRealPackage();return;}
         if(args.Contains("--network-dlss"))
@@ -198,6 +220,11 @@ internal static class Program
         Console.WriteLine($"PASS: {checks} adapter, dependency, archive, installation, uninstall and recovery checks. Only temporary fixtures were modified.");
         PerformanceChecks.Run(args.Contains("--ui"));
         LibraryChecks.Run(args.Contains("--ui"));
+        ExperienceChecks.Run(args.Contains("--ui"));
+        if(args.Contains("--ui"))LibraryPresentationChecks.Run();
+        if(args.Contains("--ui"))MotionChecks.Run();
+        if(args.Contains("--ui"))DesktopLibraryChecks.Run();
+        UpdateHelpChecks.Run(args.Contains("--ui"));
         DiscoveryChecks.Run(args.Contains("--ui"));
         PreferencesChecks.Run(args.Contains("--ui"));
         UpdateChecks.Run(args.Contains("--ui"));
@@ -206,9 +233,17 @@ internal static class Program
         GameCareChecks.Run(args.Contains("--ui"));
         WorkspaceChecks.Run(args.Contains("--ui"));
         ShortcutChecks.Run(args.Contains("--ui"));
+        UbisoftLaunchChecks.Run(args.Contains("--ui"));
+        LauncherHealthChecks.Run(args.Contains("--ui"));
         RefreshChecks.Run(args.Contains("--ui"));
         SupportBotChecks.Run();
+        ModExpansionChecks.Run();
         UniversalDlss5Checks.Run(args.Contains("--ui"));
+        Rtx30Checks.Run(args.Contains("--ui"));
+        CompatibilityChecks.Run(args.Contains("--ui"));
+        if(args.Contains("--ui")){ConcurrencyChecks.Run();AsyncAuditChecks.Run();}
+        HardwareCatalogChecks.Run(args.Contains("--ui"));
+        RedesignChecks.Run(args.Contains("--ui"));
         StrategyChecks.Run(args.Contains("--ui"));
         if (args.Contains("--ui")) ModUiChecks.Run(root, catalog.ToList());
         if (args.Contains("--network")) Network(adapter).GetAwaiter().GetResult();
