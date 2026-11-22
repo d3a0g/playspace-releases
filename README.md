@@ -8,15 +8,15 @@
 
 ## Загрузка
 
-- **LauncherPlaySpace-2.0.0-Setup.exe** — установка для текущего пользователя и проверка Microsoft WebView2.
-- **LauncherPlaySpace-2.0.0-win-x64.zip** — распакуйте полностью и запустите `LauncherPlaySpace.exe`; WebView2 нужен отдельно.
+- **LauncherPlaySpace-2.1.0-Setup.exe** — установка для текущего пользователя и проверка Microsoft WebView2.
+- **LauncherPlaySpace-2.1.0-win-x64.zip** — распакуйте полностью и запустите `LauncherPlaySpace.exe`; WebView2 нужен отдельно.
 - **SHA256SUMS.txt** — контрольные суммы файлов. Подпись нативного обновления проверяется лаунчером отдельно от Windows Authenticode.
 
 Файлы, списки изменений и предыдущие версии находятся только в [Releases](https://github.com/d3a0g/playspace-releases/releases). Этот репозиторий предназначен для готовых сборок; разработка и описание проекта — в [LauncherPlaySpace](https://github.com/d3a0g/LauncherPlaySpace).
 
 ## Моды и данные
 
-Мастерская поддерживает 78 игровых адаптеров, включая Teardown. Steam управляет Workshop-подписками; ZIP-моды устанавливает PlaySpace. Совместимость зависит от игры и мода. Приложение не содержит игры и не предоставляет лицензии на них.
+Мастерская поддерживает 81 игровой адаптер, включая Teardown. Steam управляет Workshop-подписками; ZIP-моды устанавливает PlaySpace. Совместимость зависит от игры и мода. Приложение не содержит игры и не предоставляет лицензии на них.
 
 Профиль 2.0: `%LOCALAPPDATA%\io.playspace.next.local`. Профиль 1.x сохраняется отдельно; библиотеку можно скопировать через импорт. [Установка и переход](https://github.com/d3a0g/LauncherPlaySpace/blob/main/docs/2.0/INSTALLATION.md).
 
